@@ -83,7 +83,6 @@ public class PhotonCameraWrapper extends SubsystemBase {
     photonPoseEstimator = new PhotonPoseEstimator(
       aprilTagFieldLayout,
       PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-      photonCamera,
       PhotonVisionConstants.robotToCamBack);
       
     hasInit = true;
@@ -118,6 +117,7 @@ public class PhotonCameraWrapper extends SubsystemBase {
      */
   PhotonPipelineResult getLatestResult() {
     return photonCamera.getLatestResult();
+    // return photonCamera.getAllUnreadResults().get(0); Unsure of the order packetSubscriber reads the queue in
   }
 
   /**
@@ -129,7 +129,7 @@ public class PhotonCameraWrapper extends SubsystemBase {
   */
   public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    var newPoseOptional = photonPoseEstimator.update();
+    var newPoseOptional = photonPoseEstimator.update(getLatestResult());
     if (newPoseOptional.isPresent()) {
       EstimatedRobotPose newPose = newPoseOptional.get();
       if(fastLogging || log.isMyLogRotation(logRotationKey)) {
