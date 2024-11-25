@@ -429,11 +429,12 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    */
    public void drive(double xSpeed, double ySpeed, double rot, Translation2d centerOfRotationMeters, boolean fieldRelative, boolean isOpenLoop) {
     
+    ChassisSpeeds chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, rot);
+    if(fieldRelative) chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(getGyroRotation()));
+
     SwerveModuleState[] swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees(getGyroRotation()))
-                : new ChassisSpeeds(xSpeed, ySpeed, rot),
+            chassisSpeed,
             centerOfRotationMeters);
 
     setModuleStates(swerveModuleStates, isOpenLoop);
@@ -477,7 +478,10 @@ public class DriveTrain extends SubsystemBase implements Loggable {
   public ChassisSpeeds getRobotSpeeds() {
     // Calculation from chassisSpeed to robotSpeed is just the inverse of .fromFieldRelativeSpeeds.
     // Call .fromFieldRelativeSpeeds with the negative of the robot angle to do this calculation.
-    return ChassisSpeeds.fromFieldRelativeSpeeds(getChassisSpeeds(), Rotation2d.fromDegrees(-getGyroRotation()));
+    //return ChassisSpeeds.fromFieldRelativeSpeeds(getChassisSpeeds(), Rotation2d.fromDegrees(-getGyroRotation()));
+    ChassisSpeeds chassisSpeed = getChassisSpeeds();
+    chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(-getGyroRotation()));
+    return chassisSpeed; //More efficient / better method?
   }
 
 

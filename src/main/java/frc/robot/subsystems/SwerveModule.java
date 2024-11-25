@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -357,6 +358,7 @@ public class SwerveModule {
     // Set drive motor velocity or percent output
     if(isOpenLoop){
       setDriveMotorPercentOutput(driveFeedforward.calculate(desiredState.speedMetersPerSecond));
+      //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
