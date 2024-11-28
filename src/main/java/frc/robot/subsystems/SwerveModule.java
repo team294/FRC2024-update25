@@ -23,7 +23,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.MutLinearVelocity;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,6 +35,7 @@ import frc.robot.utilities.MathSwerveModuleState;
 import frc.robot.utilities.Wait;
 
 import static frc.robot.utilities.StringUtil.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 public class SwerveModule {
       
@@ -324,6 +324,14 @@ public class SwerveModule {
   public void setDriveMotorPercentOutput(double percentOutput){
     driveMotor.setControl(driveVoltageControl.withOutput(percentOutput*SwerveConstants.voltageCompSaturation));
   }
+
+  /**
+   * 
+   * @param voltage voltage output to motor
+   */
+  public void setDriveMotorVoltageOutput(Voltage voltage){
+    driveMotor.setControl(driveVoltageControl.withOutput(voltage));
+  }
   
   /**
    * 
@@ -357,13 +365,13 @@ public class SwerveModule {
 
     // Set drive motor velocity or percent output
     if(isOpenLoop){
-      setDriveMotorPercentOutput(driveFeedforward.calculate(desiredState.speedMetersPerSecond));
+      setDriveMotorVoltageOutput(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond)));
       //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
         .withVelocity(calculateDriveEncoderVelocityRaw(desiredState.speedMetersPerSecond))
-        .withFeedForward(driveFeedforward.calculate(desiredState.speedMetersPerSecond)*SwerveConstants.voltageCompSaturation));
+        .withFeedForward(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond))));
     }
 
     // Set turning motor target angle
