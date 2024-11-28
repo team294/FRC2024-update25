@@ -116,8 +116,9 @@ public class PhotonCameraWrapper extends SubsystemBase {
      * @return The best target of the pipeline result.
      */
   PhotonPipelineResult getLatestResult() {
+    // var results = photonCamera.getAllUnreadResults();
+    // return results.size() > 0 ? results.get(results.size()-1) : null; Would not work currently, should prevent estimation if there are no new results
     return photonCamera.getLatestResult();
-    // return photonCamera.getAllUnreadResults().get(0); Unsure of the order packetSubscriber reads the queue in
   }
 
   /**
