@@ -12,6 +12,8 @@ import frc.robot.utilities.AllianceSelection;
 import frc.robot.utilities.FileLog;
 
 import java.io.IOException;
+import java.lang.StackWalker.Option;
+import java.util.List;
 import java.util.Optional;
 
 // import javax.lang.model.util.Elements.Origin;
@@ -115,10 +117,9 @@ public class PhotonCameraWrapper extends SubsystemBase {
      *
      * @return The best target of the pipeline result.
      */
-  PhotonPipelineResult getLatestResult() {
-    // var results = photonCamera.getAllUnreadResults();
-    // return results.size() > 0 ? results.get(results.size()-1) : null; Would not work currently, should prevent estimation if there are no new results
-    return photonCamera.getLatestResult();
+  Optional<PhotonPipelineResult> getLatestResult() {
+    var results = photonCamera.getAllUnreadResults();
+    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(results.size()-1));
   }
 
   /**
@@ -128,9 +129,9 @@ public class PhotonCameraWrapper extends SubsystemBase {
   *         of the observation. Assumes a planar field and the robot is always
   *         firmly on the ground
   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose, PhotonPipelineResult latestResult) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    var newPoseOptional = photonPoseEstimator.update(getLatestResult());
+    var newPoseOptional = photonPoseEstimator.update(latestResult);
     if (newPoseOptional.isPresent()) {
       EstimatedRobotPose newPose = newPoseOptional.get();
       if(fastLogging || log.isMyLogRotation(logRotationKey)) {
