@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.VisionConstants.PhotonVisionConstants;
 import frc.robot.utilities.FileLog;
 
+import java.util.List;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -57,10 +59,17 @@ public class NotePhotonCameraWrapper extends SubsystemBase {
      * @return The best target of the pipeline result.
      */
   public PhotonTrackedTarget getBestTarget() {
-    return photonCamera.getLatestResult().getBestTarget();
+    return getLatestResult().getBestTarget();
   }
 
+  /**
+   * Returns the last photon pipeline result. If there are no new 
+   * pipeline results since last call, this method will return null.
+   * 
+   * @return The latest pipeline result
+   */
   public PhotonPipelineResult getLatestResult() {
-    return photonCamera.getLatestResult();
+    List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
+    return results.isEmpty() ? null : results.get(results.size()-1);
   }
 }

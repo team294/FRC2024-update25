@@ -12,6 +12,7 @@ import frc.robot.utilities.AllianceSelection;
 import frc.robot.utilities.FileLog;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 // import javax.lang.model.util.Elements.Origin;
@@ -110,14 +111,14 @@ public class PhotonCameraWrapper extends SubsystemBase {
   }
 
   /**
-     * Returns the best target in this pipeline result. If there are no targets, this method will
+     * Returns the best target in this pipeline result. If there are no new targets, this method will
      * return null. The best target is determined by the target sort mode in the PhotonVision UI.
      *
      * @return The best target of the pipeline result.
      */
-  Optional<PhotonPipelineResult> getLatestResult() {
-    var results = photonCamera.getAllUnreadResults();
-    return results.isEmpty() ? Optional.empty() : Optional.of(results.get(results.size()-1));
+  PhotonPipelineResult getLatestResult() {
+    List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
+    return results.isEmpty() ? null : results.get(results.size()-1);
   }
 
   /**

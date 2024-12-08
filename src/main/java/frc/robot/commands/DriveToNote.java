@@ -32,6 +32,8 @@ public class DriveToNote extends Command {
   private final FileLog log;
   private int toleranceCount;
   private int logRotationKey;
+
+  private PhotonPipelineResult latestResult;
   
   private double fwdVelocity, leftVelocity, turnRate;
   // private double lastFwdPercent, lastTime, curTime;
@@ -77,8 +79,13 @@ public class DriveToNote extends Command {
     
     if (!driveTrain.getNoteCamera().hasInit()) return;
 
-    PhotonPipelineResult latestResult = driveTrain.getLatestResult();
-    if (!latestResult.hasTargets()) {
+    PhotonPipelineResult result = driveTrain.getLatestResult();
+    if (result != null) {
+      latestResult = result;
+    }
+    // Possibility latestResult will not be defined if something
+    // else gets the latest unread results in the same code cycle
+    if (!latestResult.hasTargets() || result == null) {
       if(log.isMyLogRotation(logRotationKey)) {
         log.writeLog(false, "DriveToNote", "No targets captured");
       }

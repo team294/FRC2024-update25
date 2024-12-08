@@ -594,9 +594,9 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     poseEstimator.update(Rotation2d.fromDegrees(getGyroRotation()), getModulePositions());
 
     if (camera.hasInit()) {
-      Optional<PhotonPipelineResult> latestResult = camera.getLatestResult();
-      if (latestResult.isPresent()) {
-        PhotonPipelineResult camResult = latestResult.get();
+      PhotonPipelineResult latestResult = camera.getLatestResult();
+      if (latestResult != null) {
+        PhotonPipelineResult camResult = latestResult;
         Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), camResult);
         if (result.isPresent()) {
           EstimatedRobotPose camPose = result.get();
@@ -653,10 +653,22 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     return noteCamera;
   }
 
+  /**
+   * Returns the best target in this pipeline result. If there are no targets, this method will
+   * return null. The best target is determined by the target sort mode in the PhotonVision UI.
+   *
+   * @return The best target of the pipeline result.
+   */
   public PhotonTrackedTarget getBestTarget() {
     return noteCamera.getBestTarget();
   }
 
+  /**
+   * Returns the last photon pipeline result. If there are no new 
+   * pipeline results since last call, this method will return null.
+   * 
+   * @return The latest pipeline result
+   */
   public PhotonPipelineResult getLatestResult() {
     return noteCamera.getLatestResult();
   }
