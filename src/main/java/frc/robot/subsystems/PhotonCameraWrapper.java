@@ -12,8 +12,6 @@ import frc.robot.utilities.AllianceSelection;
 import frc.robot.utilities.FileLog;
 
 import java.io.IOException;
-import java.lang.StackWalker.Option;
-import java.util.List;
 import java.util.Optional;
 
 // import javax.lang.model.util.Elements.Origin;
