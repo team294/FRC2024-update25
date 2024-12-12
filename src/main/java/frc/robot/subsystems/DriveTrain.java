@@ -476,12 +476,9 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    * @return ChassisSpeeds object representing the chassis speeds.
    */
   public ChassisSpeeds getRobotSpeeds() {
-    // Calculation from chassisSpeed to robotSpeed is just the inverse of .fromFieldRelativeSpeeds.
-    // Call .fromFieldRelativeSpeeds with the negative of the robot angle to do this calculation.
-    //return ChassisSpeeds.fromFieldRelativeSpeeds(getChassisSpeeds(), Rotation2d.fromDegrees(-getGyroRotation()));
     ChassisSpeeds chassisSpeed = getChassisSpeeds();
-    chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(-getGyroRotation()));
-    return chassisSpeed; //More efficient / better method?
+    chassisSpeed.toFieldRelativeSpeeds(Rotation2d.fromDegrees(getGyroRotation()));
+    return chassisSpeed;
   }
 
 
