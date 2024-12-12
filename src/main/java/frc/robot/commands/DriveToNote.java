@@ -80,7 +80,7 @@ public class DriveToNote extends Command {
     if (!driveTrain.getNoteCamera().hasInit()) return;
 
     PhotonPipelineResult result = driveTrain.getLatestResult();
-    
+
     if (result == null) {
 
       if(log.isMyLogRotation(logRotationKey)) {
@@ -89,8 +89,6 @@ public class DriveToNote extends Command {
       toleranceCount++;
       // stop if can't see piece
       // driveTrain.drive(0, 0, 0, false, false);
-      return;
-
     } else {
 
       latestResult = result;
