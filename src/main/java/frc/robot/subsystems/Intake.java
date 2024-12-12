@@ -110,9 +110,9 @@ public class Intake extends SubsystemBase implements Loggable {
     intakeConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.3;         // # seconds from 0 to full power
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    intakeConfig.CurrentLimits.SupplyCurrentLimit = 35.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 60.0;   // (amps) Threshold current (Was SupplyCurrentThreshold)
-    intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;       // (sec) Threshold time (Was SupplyTimeThreshold)
+    intakeConfig.CurrentLimits.SupplyCurrentLimit = 60.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    intakeConfig.CurrentLimits.SupplyCurrentLowerLimit = 35.0;   // (amps) Lower limit for the current
+    intakeConfig.CurrentLimits.SupplyCurrentLowerTime = 0.2;       // (sec) Threshold time
     intakeConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // Set intake motor sensor

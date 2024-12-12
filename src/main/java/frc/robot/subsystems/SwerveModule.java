@@ -153,8 +153,8 @@ public class SwerveModule {
 		driveMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.0;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 35.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 60.0;   // (amps) Threshold current
+    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 35.0;   // (amps) Lower limit for the current
     driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
     driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
@@ -182,8 +182,8 @@ public class SwerveModule {
 		turningMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 25.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    turningMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 40.0;   // (amps) Threshold current
+    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    turningMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 25.0;   // (amps) Lower limit for the current
     turningMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
     turningMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
