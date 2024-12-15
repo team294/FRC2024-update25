@@ -13,6 +13,11 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -39,21 +44,21 @@ public class Shooter extends SubsystemBase implements Loggable {
   private TalonFXConfiguration shooterBottomConfig;
 
   // Create signals and sensors for motors
-  private final StatusSignal<Double> shooterTopSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
-	private final StatusSignal<Double> shooterTopTemp;				// Motor temperature, in degC
+  private final StatusSignal<Voltage> shooterTopSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
+	private final StatusSignal<Temperature> shooterTopTemp;				// Motor temperature, in degC
 	private final StatusSignal<Double> shooterTopDutyCycle;				// Motor duty cycle percent power, -1 to 1
-	private final StatusSignal<Double> shooterTopStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> shooterTopEncoderPosition;			// Encoder position, in pinion rotations
-	private final StatusSignal<Double> shooterTopEncoderVelocity;
-  private final StatusSignal<Double> shooterTopVoltage;
+	private final StatusSignal<Current> shooterTopStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> shooterTopEncoderPosition;			// Encoder position, in pinion rotations
+	private final StatusSignal<AngularVelocity> shooterTopEncoderVelocity;
+  private final StatusSignal<Voltage> shooterTopVoltage;
 
   // private final StatusSignal<Double> shooterBottomSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
-	private final StatusSignal<Double> shooterBottomTemp;				// Motor temperature, in degC
+	private final StatusSignal<Temperature> shooterBottomTemp;				// Motor temperature, in degC
 	private final StatusSignal<Double> shooterBottomDutyCycle;				// Motor duty cycle percent power, -1 to 1
-	private final StatusSignal<Double> shooterBottomStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> shooterBottomEncoderPosition;			// Encoder position, in pinion rotations
-	private final StatusSignal<Double> shooterBottomEncoderVelocity;
-  private final StatusSignal<Double> shooterBottomVoltage;
+	private final StatusSignal<Current> shooterBottomStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> shooterBottomEncoderPosition;			// Encoder position, in pinion rotations
+	private final StatusSignal<AngularVelocity> shooterBottomEncoderVelocity;
+  private final StatusSignal<Voltage> shooterBottomVoltage;
 
   // Motor controls
   private VoltageOut motorVoltageControl = new VoltageOut(0.0);

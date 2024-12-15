@@ -16,11 +16,15 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Constants.Ports;
@@ -31,6 +35,7 @@ import frc.robot.utilities.MathSwerveModuleState;
 import frc.robot.utilities.Wait;
 
 import static frc.robot.utilities.StringUtil.*;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 public class SwerveModule {
       
@@ -46,12 +51,12 @@ public class SwerveModule {
   private VelocityVoltage driveVelocityControl = new VelocityVoltage(0.0);
 
 	// Drive motor signals and sensors
-	private final StatusSignal<Double> driveMotorSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
-	private final StatusSignal<Double> driveMotorTemp;				// Motor temperature, in degC
+	private final StatusSignal<Voltage> driveMotorSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
+	private final StatusSignal<Temperature> driveMotorTemp;				// Motor temperature, in degC
 	private final StatusSignal<Double> driveDutyCycle;				// Motor duty cycle percent power, -1 to 1
-	private final StatusSignal<Double> driveStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> driveEncoderPostion;			// Encoder position, in pinion rotations
-	private final StatusSignal<Double> driveEncoderVelocity;			// Encoder position, in pinion rotations/second
+	private final StatusSignal<Current> driveStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> driveEncoderPostion;			// Encoder position, in pinion rotations
+	private final StatusSignal<AngularVelocity> driveEncoderVelocity;			// Encoder position, in pinion rotations/second
 
   // Turning motor objects
   private final TalonFX turningMotor;
@@ -61,11 +66,11 @@ public class SwerveModule {
   private PositionVoltage turningPositionControl = new PositionVoltage(0.0);
 
 	// Turning motor signals and sensors
-	private final StatusSignal<Double> turningMotorTemp;				// Motor temperature, in degC
+	private final StatusSignal<Temperature> turningMotorTemp;				// Motor temperature, in degC
 	private final StatusSignal<Double> turningDutyCycle;				// Motor duty cycle percent power, -1 to 1
-	private final StatusSignal<Double> turningStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> turningEncoderPosition;			// Encoder position, in pinion rotations
-	private final StatusSignal<Double> turningEncoderVelocity;			// Encoder Velocity, in pinion rotations/second
+	private final StatusSignal<Current> turningStatorCurrent;		// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> turningEncoderPosition;			// Encoder position, in pinion rotations
+	private final StatusSignal<AngularVelocity> turningEncoderVelocity;			// Encoder Velocity, in pinion rotations/second
 
   // Variables to track motor information
   private boolean isInCoastMode;                // Current Neutral Mode setting for the drive and turning motors:  true = coast mode, false = brake mode
@@ -76,8 +81,8 @@ public class SwerveModule {
   private CANcoderConfiguration turningCanCoderConfig;
 	
   // CANCoder signals and sensors
-	private final StatusSignal<Double> turningCanCoderPosition;			// CanCoder position, in CANCoder rotations
-	private final StatusSignal<Double> turningCanCoderVelocity;			// Encoder Velocity, in CANCoder rotations/second
+	private final StatusSignal<Angle> turningCanCoderPosition;			// CanCoder position, in CANCoder rotations
+	private final StatusSignal<AngularVelocity> turningCanCoderVelocity;			// Encoder Velocity, in CANCoder rotations/second
 
   // Variables for encoder zeroing
   private double driveEncoderZero = 0;      // Reference raw encoder reading for drive motor encoder.  Calibration sets this to zero.
@@ -148,9 +153,9 @@ public class SwerveModule {
 		driveMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.0;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 35.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    driveMotorConfig.CurrentLimits.SupplyCurrentThreshold = 60.0;   // (amps) Threshold current
-    driveMotorConfig.CurrentLimits.SupplyTimeThreshold = 0.1;       // (sec) Threshold time
+    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 35.0;   // (amps) Lower limit for the current
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
     driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // configure drive encoder
@@ -177,9 +182,9 @@ public class SwerveModule {
 		turningMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 25.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    turningMotorConfig.CurrentLimits.SupplyCurrentThreshold = 40.0;   // (amps) Threshold current
-    turningMotorConfig.CurrentLimits.SupplyTimeThreshold = 0.1;       // (sec) Threshold time
+    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    turningMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 25.0;   // (amps) Lower limit for the current
+    turningMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
     turningMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // configure drive encoder
@@ -319,6 +324,14 @@ public class SwerveModule {
   public void setDriveMotorPercentOutput(double percentOutput){
     driveMotor.setControl(driveVoltageControl.withOutput(percentOutput*SwerveConstants.voltageCompSaturation));
   }
+
+  /**
+   * 
+   * @param voltage voltage output to motor
+   */
+  public void setDriveMotorVoltageOutput(Voltage voltage){
+    driveMotor.setControl(driveVoltageControl.withOutput(voltage));
+  }
   
   /**
    * 
@@ -352,12 +365,13 @@ public class SwerveModule {
 
     // Set drive motor velocity or percent output
     if(isOpenLoop){
-      setDriveMotorPercentOutput(driveFeedforward.calculate(desiredState.speedMetersPerSecond));
+      setDriveMotorVoltageOutput(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond)));
+      //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
         .withVelocity(calculateDriveEncoderVelocityRaw(desiredState.speedMetersPerSecond))
-        .withFeedForward(driveFeedforward.calculate(desiredState.speedMetersPerSecond)*SwerveConstants.voltageCompSaturation));
+        .withFeedForward(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond))));
     }
 
     // Set turning motor target angle

@@ -32,6 +32,8 @@ public class DriveToNote extends Command {
   private final FileLog log;
   private int toleranceCount;
   private int logRotationKey;
+
+  private PhotonPipelineResult latestResult;
   
   private double fwdVelocity, leftVelocity, turnRate;
   // private double lastFwdPercent, lastTime, curTime;
@@ -77,53 +79,66 @@ public class DriveToNote extends Command {
     
     if (!driveTrain.getNoteCamera().hasInit()) return;
 
-    PhotonPipelineResult latestResult = driveTrain.getLatestResult();
-    if (!latestResult.hasTargets()) {
+    PhotonPipelineResult result = driveTrain.getLatestResult();
+
+    if (result == null) {
+
       if(log.isMyLogRotation(logRotationKey)) {
         log.writeLog(false, "DriveToNote", "No targets captured");
       }
       toleranceCount++;
       // stop if can't see piece
       // driveTrain.drive(0, 0, 0, false, false);
-      return;
+    } else {
+
+      latestResult = result;
+    
+      if (!latestResult.hasTargets()) {
+        if(log.isMyLogRotation(logRotationKey)) {
+          log.writeLog(false, "DriveToNote", "No targets captured");
+        }
+        toleranceCount++;
+        // stop if can't see piece
+        // driveTrain.drive(0, 0, 0, false, false);
+        return;
+      }
+
+      toleranceCount = 0;
+      PhotonTrackedTarget bestTarget = latestResult.getBestTarget();
+      
+
+      fwdVelocity = -fwdRateController.calculate(bestTarget.getPitch());
+      leftVelocity = leftRateController.calculate(bestTarget.getYaw());
+      turnRate = turnRateController.calculate(bestTarget.getYaw());
+
+      fwdVelocity = MathUtil.clamp(fwdVelocity, -SwerveConstants.kMaxSpeedMetersPerSecond, SwerveConstants.kMaxSpeedMetersPerSecond);
+      leftVelocity = MathUtil.clamp(leftVelocity, -SwerveConstants.kMaxSpeedMetersPerSecond, SwerveConstants.kMaxSpeedMetersPerSecond);
+      turnRate = MathUtil.clamp(turnRate, -SwerveConstants.kMaxTurningRadiansPerSecond, SwerveConstants.kMaxTurningRadiansPerSecond);
+
+      if(log.isMyLogRotation(logRotationKey)) {
+        System.out.println(bestTarget.getYaw());
+        log.writeLog(false, "DriveToNote", "Joystick", "Fwd", fwdVelocity, "Left", leftVelocity, "Turn", turnRate);
+      }
+      
+      // double fwdRateChange = (fwdPercent - lastFwdPercent) / (curTime - lastTime);
+      // if (fwdRateChange > maxFwdRateChange) {
+      //   fwdPercent = lastFwdPercent + (curTime - lastTime)*maxFwdRateChange;
+      // } else if (fwdRateChange < maxRevRateChange) {
+      //   fwdPercent = lastFwdPercent +(curTime - lastTime)*maxRevRateChange;
+
+      // }
+
+      SmartDashboard.putNumber("DriveToNote fwd", fwdVelocity);
+      SmartDashboard.putNumber("DriveToNote left", leftVelocity);
+      SmartDashboard.putNumber("DriveToNote turnRate", turnRate);
+      SmartDashboard.putNumber("DriveToNote BestTargetPitch", bestTarget.getPitch());
+      SmartDashboard.putNumber("DriveToNote BestTargetYaw", bestTarget.getYaw());
+      
+      driveTrain.drive(fwdVelocity, leftVelocity, turnRate, false, false);
+
+      // lastFwdPercent = fwdPercent;
+      // lastTime = curTime;
     }
-
-
-    toleranceCount = 0;
-    PhotonTrackedTarget bestTarget = latestResult.getBestTarget();
-    
-
-    fwdVelocity = -fwdRateController.calculate(bestTarget.getPitch());
-    leftVelocity = leftRateController.calculate(bestTarget.getYaw());
-    turnRate = turnRateController.calculate(bestTarget.getYaw());
-
-    fwdVelocity = MathUtil.clamp(fwdVelocity, -SwerveConstants.kMaxSpeedMetersPerSecond, SwerveConstants.kMaxSpeedMetersPerSecond);
-    leftVelocity = MathUtil.clamp(leftVelocity, -SwerveConstants.kMaxSpeedMetersPerSecond, SwerveConstants.kMaxSpeedMetersPerSecond);
-    turnRate = MathUtil.clamp(turnRate, -SwerveConstants.kMaxTurningRadiansPerSecond, SwerveConstants.kMaxTurningRadiansPerSecond);
-
-    if(log.isMyLogRotation(logRotationKey)) {
-      System.out.println(bestTarget.getYaw());
-      log.writeLog(false, "DriveToNote", "Joystick", "Fwd", fwdVelocity, "Left", leftVelocity, "Turn", turnRate);
-    }
-    
-    // double fwdRateChange = (fwdPercent - lastFwdPercent) / (curTime - lastTime);
-    // if (fwdRateChange > maxFwdRateChange) {
-    //   fwdPercent = lastFwdPercent + (curTime - lastTime)*maxFwdRateChange;
-    // } else if (fwdRateChange < maxRevRateChange) {
-    //   fwdPercent = lastFwdPercent +(curTime - lastTime)*maxRevRateChange;
-
-    // }
-
-    SmartDashboard.putNumber("DriveToNote fwd", fwdVelocity);
-    SmartDashboard.putNumber("DriveToNote left", leftVelocity);
-    SmartDashboard.putNumber("DriveToNote turnRate", turnRate);
-    SmartDashboard.putNumber("DriveToNote BestTargetPitch", bestTarget.getPitch());
-    SmartDashboard.putNumber("DriveToNote BestTargetYaw", bestTarget.getYaw());
-    
-    driveTrain.drive(fwdVelocity, leftVelocity, turnRate, false, false);
-
-    // lastFwdPercent = fwdPercent;
-    // lastTime = curTime;
   }
 
   // Called once the command ends or is interrupted.

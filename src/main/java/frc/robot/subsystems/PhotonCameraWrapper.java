@@ -12,6 +12,7 @@ import frc.robot.utilities.AllianceSelection;
 import frc.robot.utilities.FileLog;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 // import javax.lang.model.util.Elements.Origin;
@@ -83,7 +84,6 @@ public class PhotonCameraWrapper extends SubsystemBase {
     photonPoseEstimator = new PhotonPoseEstimator(
       aprilTagFieldLayout,
       PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
-      photonCamera,
       PhotonVisionConstants.robotToCamBack);
       
     hasInit = true;
@@ -111,13 +111,14 @@ public class PhotonCameraWrapper extends SubsystemBase {
   }
 
   /**
-     * Returns the best target in this pipeline result. If there are no targets, this method will
+     * Returns the best target in this pipeline result. If there are no new targets, this method will
      * return null. The best target is determined by the target sort mode in the PhotonVision UI.
      *
      * @return The best target of the pipeline result.
      */
   PhotonPipelineResult getLatestResult() {
-    return photonCamera.getLatestResult();
+    List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
+    return results.isEmpty() ? null : results.get(results.size()-1);
   }
 
   /**
@@ -127,9 +128,9 @@ public class PhotonCameraWrapper extends SubsystemBase {
   *         of the observation. Assumes a planar field and the robot is always
   *         firmly on the ground
   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose) {
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose, PhotonPipelineResult latestResult) {
     photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    var newPoseOptional = photonPoseEstimator.update();
+    var newPoseOptional = photonPoseEstimator.update(latestResult);
     if (newPoseOptional.isPresent()) {
       EstimatedRobotPose newPose = newPoseOptional.get();
       if(fastLogging || log.isMyLogRotation(logRotationKey)) {

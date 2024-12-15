@@ -109,25 +109,27 @@ public class HolonomicDriveControllerBCR {
     // Calculate feedforward velocities (field-relative).
     double xFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getCos();
     double yFF = desiredLinearVelocityMetersPerSecond * trajectoryPose.getRotation().getSin();
-    double thetaFeedback =
-        m_thetaController.calculate(
-            currentPose.getRotation().getRadians(), desiredHeading.getRadians());
     double thetaFF = m_thetaController.getSetpoint().velocity;
 
     m_poseError = trajectoryPose.relativeTo(currentPose);
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
-
+    ChassisSpeeds chassisSpeed = new ChassisSpeeds(xFF, yFF, thetaFF);
     if (!m_enabled) {
-      return ChassisSpeeds.fromFieldRelativeSpeeds(xFF, yFF, thetaFF, currentPose.getRotation());
+      chassisSpeed.toRobotRelativeSpeeds(currentPose.getRotation());
+      return chassisSpeed;
     }
 
     // Calculate feedback velocities (based on position error).
     double xFeedback = m_xController.calculate(currentPose.getX(), trajectoryPose.getX());
     double yFeedback = m_yController.calculate(currentPose.getY(), trajectoryPose.getY());
+    double thetaFeedback = m_thetaController.calculate(currentPose.getRotation().getRadians(), desiredHeading.getRadians());
 
     // Return next output.
-    return ChassisSpeeds.fromFieldRelativeSpeeds(
-        xFF + xFeedback, yFF + yFeedback, thetaFF + thetaFeedback, currentPose.getRotation());
+    chassisSpeed.vxMetersPerSecond += xFeedback;
+    chassisSpeed.vyMetersPerSecond += yFeedback;
+    chassisSpeed.omegaRadiansPerSecond += thetaFeedback;
+    chassisSpeed.toRobotRelativeSpeeds(currentPose.getRotation());
+    return chassisSpeed;
   }
 
   /**

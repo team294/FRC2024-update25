@@ -71,7 +71,6 @@ public class RobotContainer {
   private final Joystick coPanel = new Joystick(OIConstants.usbCoPanel);
 
   private final CommandXboxController xboxController = new CommandXboxController(OIConstants.usbXboxController);
-  private boolean lastEnabledModeAuto = true;    // True if the last mode was auto (if so, then don't go to coast mode on drivetrain).  Boot with true, so initial disabledInit does not go into Coast mode.
 
   // Set to this pattern when the robot is disabled
   
@@ -406,12 +405,6 @@ public class RobotContainer {
   public void disabledInit() {
     log.writeLogEcho(true, "Disabled", "Robot disabled");   // Don't log the word "Init" here -- it affects the Excel macro
 
-    // Code added Shuffleboard control to put robot in coast/brake mode.
-    // Just leave robot in brake mode when disabling so that it stops quickly if it is still moving.
-    // if (!lastEnabledModeAuto) {
-    //   driveTrain.setDriveModeCoast(true);     // When pushing a disabled robot by hand, it is a lot easier to push in Coast mode!!!!
-    // }
-
     driveTrain.stopMotors();                // SAFETY:  Turn off any closed loop control that may be running, so the robot does not move when re-enabled.
     driveTrain.enableFastLogging(false);    // Turn off fast logging, in case it was left on from auto mode
     driveTrain.setVisionForOdometryState(true);
@@ -445,7 +438,6 @@ public class RobotContainer {
    */
   public void autonomousInit() {
     log.writeLogEcho(true, "Auto", "Mode Init");
-    lastEnabledModeAuto = true;
 
     driveTrain.setDriveModeCoast(false);
     driveTrain.setVisionForOdometryState(false);
@@ -466,7 +458,6 @@ public class RobotContainer {
    */
   public void teleopInit() {
     log.writeLogEcho(true, "Teleop", "Mode Init");
-    lastEnabledModeAuto = false;
 
     driveTrain.setDriveModeCoast(false);
     driveTrain.enableFastLogging(false);    // Turn off fast logging, in case it was left on from auto mode

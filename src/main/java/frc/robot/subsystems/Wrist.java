@@ -17,6 +17,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
@@ -54,19 +60,19 @@ public class Wrist extends SubsystemBase implements Loggable{
   
 
 	// Variables for motor signals and sensors
-	private final StatusSignal<Double> wrist1Temp = wristMotor1.getDeviceTemp();				  // Motor temperature, in degC
+	private final StatusSignal<Temperature> wrist1Temp = wristMotor1.getDeviceTemp();				  // Motor temperature, in degC
 	private final StatusSignal<ControlModeValue> wrist1ControlMode = wristMotor1.getControlMode();			// Motor control mode (typ. ControlModeValue.VoltageOut or .PositionVoltage)
 	private final StatusSignal<Double> wrist1DutyCycle = wristMotor1.getDutyCycle();				  // Motor duty cycle percent power, -1 to 1
-  private final StatusSignal<Double> wrist1MotorVotage = wristMotor1.getMotorVoltage();       // Motor output voltage
-	private final StatusSignal<Double> wrist1StatorCurrent = wristMotor1.getStatorCurrent();	// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> wrist1EncoderPostion = wristMotor1.getPosition();			// Encoder position, in pinion rotations
-  private final StatusSignal<Double> wrist1EncoderVelocity = wristMotor1.getVelocity();     // Encoder velocity, in pinion rotations per second
-  private final StatusSignal<Double> wrist1EncoderAcceleration = wristMotor1.getAcceleration();     // Encoder acceleration, in pinion rotations per second^2
+  private final StatusSignal<Voltage> wrist1MotorVotage = wristMotor1.getMotorVoltage();       // Motor output voltage
+	private final StatusSignal<Current> wrist1StatorCurrent = wristMotor1.getStatorCurrent();	// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> wrist1EncoderPostion = wristMotor1.getPosition();			// Encoder position, in pinion rotations
+  private final StatusSignal<AngularVelocity> wrist1EncoderVelocity = wristMotor1.getVelocity();     // Encoder velocity, in pinion rotations per second
+  private final StatusSignal<AngularAcceleration> wrist1EncoderAcceleration = wristMotor1.getAcceleration();     // Encoder acceleration, in pinion rotations per second^2
 
-	private final StatusSignal<Double> wrist2Temp = wristMotor2.getDeviceTemp();				  // Motor temperature, in degC
+	private final StatusSignal<Temperature> wrist2Temp = wristMotor2.getDeviceTemp();				  // Motor temperature, in degC
 	private final StatusSignal<Double> wrist2DutyCycle = wristMotor2.getDutyCycle();				  // Motor duty cycle percent power, -1 to 1
-	private final StatusSignal<Double> wrist2StatorCurrent = wristMotor2.getStatorCurrent();	// Motor stator current, in amps (+=fwd, -=rev)
-	private final StatusSignal<Double> wrist2EncoderPostion = wristMotor2.getPosition();			// Encoder position, in pinion rotations
+	private final StatusSignal<Current> wrist2StatorCurrent = wristMotor2.getStatorCurrent();	// Motor stator current, in amps (+=fwd, -=rev)
+	private final StatusSignal<Angle> wrist2EncoderPostion = wristMotor2.getPosition();			// Encoder position, in pinion rotations
 
   // Wrist bump switches
   private final DigitalInput lowerLimit1 = new DigitalInput(Ports.DIOWristLowerLimit1);
