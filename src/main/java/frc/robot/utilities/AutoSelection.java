@@ -45,6 +45,7 @@ public class AutoSelection {
 	public static final int SourceFifthNoteAndShoot = 18;
 	public static final int SourceWallMobilityAuto = 19;
 	public static final int AmpThreePieceCenter = 20;
+	public static final int ChoreoTrajectory = 21;
 
 	private final AllianceSelection allianceSelection;
 	private final TrajectoryCache trajectoryCache;
@@ -79,6 +80,7 @@ public class AutoSelection {
 		autoChooser.addOption("SourceFifthNoteAndShoot", SourceFifthNoteAndShoot);
 		autoChooser.addOption("SourceMobilityIntoSide", SourceWallMobilityAuto);
 		autoChooser.addOption("AmpThreePieceCenter", AmpThreePieceCenter);
+		autoChooser.addOption("ChoreoTrajectory", ChoreoTrajectory);
 
 
 
