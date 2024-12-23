@@ -115,7 +115,7 @@ public class HolonomicDriveControllerBCR {
     m_rotationError = desiredHeading.minus(currentPose.getRotation());
     ChassisSpeeds chassisSpeed = new ChassisSpeeds(xFF, yFF, thetaFF);
     if (!m_enabled) {
-      chassisSpeed.toRobotRelativeSpeeds(currentPose.getRotation());
+      chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeed, currentPose.getRotation());
       return chassisSpeed;
     }
 
@@ -128,7 +128,7 @@ public class HolonomicDriveControllerBCR {
     chassisSpeed.vxMetersPerSecond += xFeedback;
     chassisSpeed.vyMetersPerSecond += yFeedback;
     chassisSpeed.omegaRadiansPerSecond += thetaFeedback;
-    chassisSpeed.toRobotRelativeSpeeds(currentPose.getRotation());
+    chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeed, currentPose.getRotation());
     return chassisSpeed;
   }
 

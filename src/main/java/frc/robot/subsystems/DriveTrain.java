@@ -430,7 +430,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    public void drive(double xSpeed, double ySpeed, double rot, Translation2d centerOfRotationMeters, boolean fieldRelative, boolean isOpenLoop) {
     
     ChassisSpeeds chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, rot);
-    if(fieldRelative) chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(getGyroRotation()));
+    if(fieldRelative) chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(chassisSpeed, Rotation2d.fromDegrees(getGyroRotation()));
 
     SwerveModuleState[] swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
@@ -477,7 +477,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    */
   public ChassisSpeeds getRobotSpeeds() {
     ChassisSpeeds chassisSpeed = getChassisSpeeds();
-    chassisSpeed.toFieldRelativeSpeeds(Rotation2d.fromDegrees(getGyroRotation()));
+    chassisSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(chassisSpeed, Rotation2d.fromDegrees(getGyroRotation()));
     return chassisSpeed;
   }
 
