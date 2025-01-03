@@ -220,6 +220,11 @@ public class AutoSelection {
 			autonomousCommandMain = new AmpThreePieceCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
+		else if (autoPlan == ChoreoTrajectory){
+			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory");
+			
+		}
+
 		else if (autonomousCommandMain == null) {
 			log.writeLogEcho(true, "AutoSelect", "No autocommand found");
 			autonomousCommandMain = new WaitCommand(1);
