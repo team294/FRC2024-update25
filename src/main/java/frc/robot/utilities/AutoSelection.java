@@ -3,6 +3,9 @@ package frc.robot.utilities;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import choreo.auto.AutoFactory;
+import choreo.auto.AutoRoutine;
+import choreo.auto.AutoTrajectory;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,6 +14,7 @@ import frc.robot.Constants.StopType;
 import frc.robot.commands.DriveResetPose;
 import frc.robot.commands.DriveTrajectory;
 import frc.robot.commands.Autos.*;
+import frc.robot.commands.Sequences.IntakePiece;
 import frc.robot.commands.Sequences.ShootPiece;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Feeder;
@@ -103,9 +107,10 @@ public class AutoSelection {
 	 * @return the command to run
 	 */
 
-	public Command getAutoCommand(Intake intake, Wrist wrist, Shooter shooter, Feeder feeder, DriveTrain driveTrain, BCRRobotState robotState, FileLog log) {
+	public Command getAutoCommand(Intake intake, Wrist wrist, Shooter shooter, Feeder feeder, DriveTrain driveTrain, BCRRobotState robotState, AutoFactory autoFactory, FileLog log) {
 		Command autonomousCommandMain = null;
 
+		
 		// Get parameters from Shuffleboard
 		int autoPlan = autoChooser.getSelected();
 		log.writeLogEcho(true, "AutoSelect", "autoPlan",autoPlan);
@@ -222,7 +227,19 @@ public class AutoSelection {
 
 		else if (autoPlan == ChoreoTrajectory){
 			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory");
-			
+			AutoRoutine routine = autoFactory.newRoutine("Test-Trajectory");
+			AutoTrajectory testingTraj1 = routine.trajectory("Test-Path", 0);
+			AutoTrajectory testingTraj2 = routine.trajectory("Test-Path", 1);
+			routine.active().onTrue(
+				new SequentialCommandGroup(
+					new WaitCommand(waitTime),
+					autoFactory.resetOdometry("Test-Path"),
+					testingTraj1.cmd()
+				)
+			);
+			testingTraj1.atTime("intake").onTrue(new IntakePiece(intake, feeder, wrist, shooter, robotState, log));
+			testingTraj1.done().onTrue(testingTraj2.cmd());
+			autonomousCommandMain = new WaitCommand(1);
 		}
 
 		else if (autonomousCommandMain == null) {

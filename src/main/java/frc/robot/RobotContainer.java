@@ -36,6 +36,8 @@ import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
+import choreo.auto.AutoFactory;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -59,6 +61,13 @@ public class RobotContainer {
   private final TrajectoryCache trajectoryCache = new TrajectoryCache(log);
   private final AutoSelection autoSelection = new AutoSelection(trajectoryCache, allianceSelection, log);
   private final BCRRobotState robotState = new BCRRobotState();
+  private final AutoFactory autoFactory = new AutoFactory(
+    driveTrain::getPose,
+    driveTrain::resetPose,
+    driveTrain::choreoFollowTrajectory,
+    false, 
+    driveTrain,
+    null); 
   
   // Is a subsystem, but requires a utility
   private final LED led = new LED(Constants.Ports.CANdle1, "LED", shooter, feeder, robotState, matchTimer, wrist, log);
@@ -78,6 +87,7 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
     configureShuffleboard();
+
 
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
     driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
@@ -365,13 +375,14 @@ public class RobotContainer {
   }
 
 
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelection.getAutoCommand(intake, wrist, shooter, feeder, driveTrain, robotState, log);
+    return autoSelection.getAutoCommand(intake, wrist, shooter, feeder, driveTrain, robotState, autoFactory, log);
   }
 
 
