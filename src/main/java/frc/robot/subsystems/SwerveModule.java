@@ -205,7 +205,7 @@ public class SwerveModule {
 
  		// Start with factory default CANCoder configuration
     turningCanCoderConfig = new CANcoderConfiguration();			// Factory default configuration
-    turningCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+    turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
     turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;  //TODO Determine which direction is reversed
 
     // Configure the swerve module motors and encoders
