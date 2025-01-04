@@ -205,7 +205,7 @@ public class SwerveModule {
 
  		// Start with factory default CANCoder configuration
     turningCanCoderConfig = new CANcoderConfiguration();			// Factory default configuration
-    turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5;
+    turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
     turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;  //TODO Determine which direction is reversed
 
     // Configure the swerve module motors and encoders
@@ -327,9 +327,9 @@ public class SwerveModule {
 
   /**
    * 
-   * @param voltage voltage output to motor
+   * @param voltage voltage output to motor, nominally -12V to +12V
    */
-  public void setDriveMotorVoltageOutput(Voltage voltage){
+  public void setDriveMotorVoltageOutput(double voltage){
     driveMotor.setControl(driveVoltageControl.withOutput(voltage));
   }
   
@@ -365,13 +365,13 @@ public class SwerveModule {
 
     // Set drive motor velocity or percent output
     if(isOpenLoop){
-      setDriveMotorVoltageOutput(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond)));
+      setDriveMotorVoltageOutput(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond));
       //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
         .withVelocity(calculateDriveEncoderVelocityRaw(desiredState.speedMetersPerSecond))
-        .withFeedForward(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond))));
+        .withFeedForward(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)));
     }
 
     // Set turning motor target angle
