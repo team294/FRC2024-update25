@@ -366,7 +366,6 @@ public class SwerveModule {
     // Set drive motor velocity or percent output
     if(isOpenLoop){
       setDriveMotorVoltageOutput(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond));
-      //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
