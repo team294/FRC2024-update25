@@ -158,7 +158,7 @@ public final class Constants {
       public static final double kVmBL = kVmBLrel / kVmAvg;
       public static final double kVmBR = kVmBRrel / kVmAvg;
 
-
+      public static final double dt = 0.02;       // Timestep for discretizing robot motion, in seconds.  Set this to the scheduler time period = 20ms.
       public static final double kADrive = 0.0 * voltageCompSaturation; // In voltage per meters per second squared.
       public static final double kADriveToPose = 0.100;  // Updated to 0.100 for A3, looks good.  CALIBRATED.  In time (seconds).
       public static final double kSDrive = 0.0080 * voltageCompSaturation; // init cal done.  formerly 0.0255, CALIBRATED.  In voltage.

@@ -68,12 +68,11 @@ public class LEDSegment {
         else return animation[frame];
     }
 
-    // TODO: should be public?
     /**
      * Return whether the animation has finished
      * @return whether the animation has finished
      */
-    private boolean isFinished() {
+    public boolean isFinished() {
         return frame >= animation.length;
     }
 

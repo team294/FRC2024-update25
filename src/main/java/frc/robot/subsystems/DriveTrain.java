@@ -154,7 +154,6 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     // Set initial location to 0,0.
     poseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, Rotation2d.fromDegrees(getGyroRotation()), 
        getModulePositions(), new Pose2d(0, 0, Rotation2d.fromDegrees(0)) );
-    // poseEstimator.setVisionMeasurementStdDevs(); // TODO
     SmartDashboard.putData("Field", field);
   }
   
@@ -351,7 +350,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     ySlewed = chassisSpeeds.vyMetersPerSecond;            // No limiting for this robot -- it can't tip
 
     // Discretize the movement to avoid unintended robot translation while robot is rotating
-    chassisSpeeds = ChassisSpeeds.discretize(xSlewed, ySlewed, omegaLimited, 0.02);
+    chassisSpeeds = ChassisSpeeds.discretize(xSlewed, ySlewed, omegaLimited, SwerveConstants.dt);
 
     // convert back to swerve module states
     desiredStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds, new Translation2d());
@@ -366,8 +365,6 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     swerveBackLeft.setDesiredState(desiredStates[2], isOpenLoop);
     swerveBackRight.setDesiredState(desiredStates[3], isOpenLoop);
   }
-
-  // TODO Add version of setModuleStates with acceleration
 
   /**
    * Reads the current swerve ModuleStates.
