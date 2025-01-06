@@ -48,8 +48,11 @@ public class RobotContainer {
   private final AllianceSelection allianceSelection = new AllianceSelection(log);
   private final Timer matchTimer = new Timer();
 
+  // Need to define this before LED because LED uses it
+  private final BCRRobotState robotState = new BCRRobotState();
+  
   // Is a subsystem, but requires a utility
-  private final LED led = new LED(Constants.Ports.CANdle1, "LED", matchTimer, log);
+  private final LED led = new LED(Constants.Ports.CANdle1, "LED", matchTimer, log, robotState);
   
   // Define robot subsystems  
   private final DriveTrain driveTrain = new DriveTrain(allianceSelection, log);
@@ -61,7 +64,6 @@ public class RobotContainer {
   // Define other utilities
   private final TrajectoryCache trajectoryCache = new TrajectoryCache(log);
   private final AutoSelection autoSelection = new AutoSelection(trajectoryCache, allianceSelection, log);
-  private final BCRRobotState robotState = new BCRRobotState();
   
 
 

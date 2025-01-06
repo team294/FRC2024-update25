@@ -50,10 +50,11 @@ public class LED extends SubsystemBase {
    * @param matchTimer
    * @param log
    */
-  public LED(int CANPort, String subsystemName, Timer matchTimer, FileLog log) {
+  public LED(int CANPort, String subsystemName, Timer matchTimer, FileLog log, BCRRobotState robotState) {
     this.subsystemName = subsystemName;
     this.candle = new CANdle(CANPort, "");
     this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
+    this.robotState = robotState;
     this.currentState = BCRRobotState.State.IDLE;
     this.matchTimer = matchTimer;
     this.shouldClear = false;
@@ -80,10 +81,11 @@ public class LED extends SubsystemBase {
    * @param subsystemName
    * @param log
    */
-  public LED(int CANPort, String subsystemName, FileLog log) {
+  public LED(int CANPort, String subsystemName, FileLog log, BCRRobotState robotState) {
     this.subsystemName = subsystemName;
     this.candle = new CANdle(CANPort, "");
     this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
+    this.robotState = robotState;
     this.currentState = BCRRobotState.State.IDLE;
     this.shouldClear = false;
     this.log = log;
