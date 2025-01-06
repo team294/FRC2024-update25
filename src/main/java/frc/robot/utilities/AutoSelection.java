@@ -227,19 +227,9 @@ public class AutoSelection {
 
 		else if (autoPlan == ChoreoTrajectory){
 			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory");
-			AutoRoutine routine = autoFactory.newRoutine("Test-Trajectory");
-			AutoTrajectory testingTraj1 = routine.trajectory("Test-Path", 0);
-			AutoTrajectory testingTraj2 = routine.trajectory("Test-Path", 1);
-			routine.active().onTrue(
-				new SequentialCommandGroup(
-					new WaitCommand(waitTime),
-					autoFactory.resetOdometry("Test-Path"),
-					testingTraj1.cmd()
-				)
-			);
-			testingTraj1.atTime("intake").onTrue(new IntakePiece(intake, feeder, wrist, shooter, robotState, log));
-			testingTraj1.done().onTrue(testingTraj2.cmd());
-			autonomousCommandMain = new WaitCommand(1);
+			autonomousCommandMain = new SequentialCommandGroup(
+				autoFactory.resetOdometry("Test-Path"),
+				autoFactory.trajectoryCmd("Test-Path"));
 		}
 
 		else if (autonomousCommandMain == null) {

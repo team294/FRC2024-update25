@@ -37,6 +37,7 @@ import frc.robot.utilities.BCRRobotState.State;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import choreo.auto.AutoFactory;
+import choreo.auto.AutoFactory.AutoBindings;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -61,13 +62,8 @@ public class RobotContainer {
   private final TrajectoryCache trajectoryCache = new TrajectoryCache(log);
   private final AutoSelection autoSelection = new AutoSelection(trajectoryCache, allianceSelection, log);
   private final BCRRobotState robotState = new BCRRobotState();
-  private final AutoFactory autoFactory = new AutoFactory(
-    driveTrain::getPose,
-    driveTrain::resetPose,
-    driveTrain::choreoFollowTrajectory,
-    false, 
-    driveTrain,
-    null); 
+  private final AutoBindings bindings = new AutoBindings();
+  private final AutoFactory autoFactory; 
   
   // Is a subsystem, but requires a utility
   private final LED led = new LED(Constants.Ports.CANdle1, "LED", shooter, feeder, robotState, matchTimer, wrist, log);
@@ -87,7 +83,13 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
     configureShuffleboard();
-
+    autoFactory = new AutoFactory(
+      driveTrain::getPose,
+      driveTrain::resetPose,
+      driveTrain::choreoFollowTrajectory,
+      false, 
+      driveTrain,
+      bindings);
 
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
     driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
