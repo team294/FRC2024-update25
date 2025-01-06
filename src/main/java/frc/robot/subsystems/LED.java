@@ -30,14 +30,15 @@ public class LED extends SubsystemBase {
   private String subsystemName;
   private BCRRobotState robotState;
   private BCRRobotState.State currentState;
-  private Shooter shooter;
-  private Feeder feeder;
   private Timer matchTimer;
   private Timer pieceTimer = new Timer();
   private boolean shouldClear;
-  private Wrist wrist;
   private boolean isRainbow;
   private boolean hasPiece;
+  private boolean shooterVelocityWithinError;
+  private boolean shooterRPMAboveZero;
+  private double shooterPercent;
+  private boolean wristCalibrated;
 
   // private Color[] accuracyDisplayPattern = {Color.kRed, Color.kRed};
   private HashMap<LEDSegmentRange, LEDSegment> segments;
@@ -46,29 +47,51 @@ public class LED extends SubsystemBase {
    * Creates the CANdle LED subsystem.
    * @param CANPort
    * @param subsystemName
-   * @param shooter
-   * @param feeder
-   * @param robotState
    * @param matchTimer
-   * @param wrist
    * @param log
    */
-  public LED(int CANPort, String subsystemName, Shooter shooter, Feeder feeder, 
-             BCRRobotState robotState, Timer matchTimer, Wrist wrist, FileLog log)
-            {
+  public LED(int CANPort, String subsystemName, Timer matchTimer, FileLog log) {
     this.subsystemName = subsystemName;
     this.candle = new CANdle(CANPort, "");
     this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
-    this.robotState = robotState;
     this.currentState = BCRRobotState.State.IDLE;
-    this.shooter = shooter;
-    this.feeder = feeder;
     this.matchTimer = matchTimer;
     this.shouldClear = false;
-    this.wrist = wrist;
     this.log = log;
     this.isRainbow = false;
     this.hasPiece = false;
+    this.shooterVelocityWithinError = false;
+    this.shooterRPMAboveZero = false;
+    this.shooterPercent = 0;
+    logRotationKey = log.allocateLogRotation();
+
+    // this.accuracyDisplayThreshold = 35;
+    // this.accuracy = 0;
+
+    // Create the LED segments
+    for (LEDSegmentRange segment : LEDSegmentRange.values()) {
+      segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
+    }
+  }
+
+  /**
+   * Creates the CANdle LED subsystem without requiring a Timer object.
+   * @param CANPort
+   * @param subsystemName
+   * @param log
+   */
+  public LED(int CANPort, String subsystemName, FileLog log) {
+    this.subsystemName = subsystemName;
+    this.candle = new CANdle(CANPort, "");
+    this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
+    this.currentState = BCRRobotState.State.IDLE;
+    this.shouldClear = false;
+    this.log = log;
+    this.isRainbow = false;
+    this.hasPiece = false;
+    this.shooterVelocityWithinError = false;
+    this.shooterRPMAboveZero = false;
+    this.shooterPercent = 0;
     logRotationKey = log.allocateLogRotation();
 
     // this.accuracyDisplayThreshold = 35;
@@ -97,6 +120,34 @@ public class LED extends SubsystemBase {
     hasPiece = false;
   }
   
+  public void setshooterVelocityWithinError() {
+    shooterVelocityWithinError = true;
+  }
+
+  public void clearshooterVelocityWithinError() {
+    shooterVelocityWithinError = false;
+  }
+
+  public void setShooterRPMAboveZero() {
+    shooterRPMAboveZero = true;
+  }
+
+  public void clearShooterRPMAboveZero() {
+    shooterRPMAboveZero = false;
+  }
+
+  public void setShooterPercent (double percent) {
+    shooterPercent = percent;
+  }
+
+  public void setWristCalibrated() {
+    wristCalibrated = true;
+  }
+
+  public void clearWristCalibrated() {
+    wristCalibrated = false;
+  }
+
   /** Get the subsystem's name
    * @return the name of the subsystem
    */
@@ -282,10 +333,9 @@ public class LED extends SubsystemBase {
     // Set LEDs to match the state, as defined in Constants.BCRColor
     switch (currentState) {
     case IDLE:
-      if (feeder.isPiecePresent()) {
+      if (hasPiece) {
         pieceTimer.start();
         if (pieceTimer.get() >= .5) {
-          setHasPiece();
           pieceTimer.stop();
           pieceTimer.reset();
         }
@@ -293,16 +343,14 @@ public class LED extends SubsystemBase {
           pieceTimer.stop();
           pieceTimer.reset();
       }
-      if (hasPiece || feeder.isPiecePresent()) {
-        if(shooter.isVelocityControlOn() && Math.abs(shooter.getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance   // if wheels are up to speed, set LEDs green
-        && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
+      if (hasPiece) {
+        if (shooterVelocityWithinError && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
           setAnimation(new Color(0, 255, 0), segment);  // rgb instead of kGreen due to error (kGreen is yellow for some reason)
-        } else if (shooter.getTopShooterTargetRPM() > 0 && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
-          Double percent = shooter.getTopShooterVelocity() / shooter.getTopShooterTargetRPM();
+        } else if (shooterRPMAboveZero && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
           Color[] segmentPattern = new Color[segment.count];
           if (segment == LEDSegmentRange.StripLeft) {
             for (int i = 0; i < segment.count; i++) {
-              if (i >= (1.0 - percent) * segment.count) {
+              if (i >= (1.0 - shooterPercent) * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason 
@@ -310,7 +358,7 @@ public class LED extends SubsystemBase {
             }
           } else if (segment == LEDSegmentRange.StripRight) {
             for (int i = 0; i < segment.count; i++) {
-              if (i <= percent * segment.count) {
+              if (i <= shooterPercent * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason
@@ -375,11 +423,11 @@ public class LED extends SubsystemBase {
       }
 
       // Sets CANdle yellow until wrist is calibrated
-      if (!wrist.isEncoderCalibrated()) {
+      if (wristCalibrated) {
         setAnimation(Color.kYellow, LEDSegmentRange.CANdle);
       }
       // Removes yellow when wrist is calibrated
-      else if (wrist.isEncoderCalibrated() && !stickyFault) {
+      else if (wristCalibrated && !stickyFault) {
         setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
       }
 

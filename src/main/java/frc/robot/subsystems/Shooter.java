@@ -19,9 +19,11 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
+import frc.robot.Constants.LEDConstants.LEDSegmentRange;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
@@ -30,6 +32,7 @@ import frc.robot.utilities.StringUtil;
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
   private boolean fastLogging = false;
+  private final LED led;
   private int logRotationKey;
   private final String subsystemName;
 
@@ -72,8 +75,9 @@ public class Shooter extends SubsystemBase implements Loggable {
    * Create the shooter subsystem
    * @param log
    */
-  public Shooter(FileLog log) {
+  public Shooter(FileLog log, LED led) {
     this.log = log;
+    this.led = led;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Shooter";
 
@@ -305,7 +309,13 @@ public class Shooter extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
       
-    }
+      if (isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) {led.setshooterVelocityWithinError();}
+      else if (getTopShooterTargetRPM() > 0)  {
+        led.setShooterRPMAboveZero();
+        led.setShooterPercent(getTopShooterVelocity() / getTopShooterTargetRPM());
+      }
+      else {led.clearshooterVelocityWithinError();}
+   }
   }
 
   /**
