@@ -343,21 +343,24 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
 
+    // Convert states to chassisspeeds and slew limit velocities (limit acceleration) to avoid tipping the robot.
+    ChassisSpeeds chassisSpeeds = kDriveKinematics.toChassisSpeeds(desiredStates);
+    double xSlewed, omegaLimited, ySlewed;
+    omegaLimited = chassisSpeeds.omegaRadiansPerSecond;   // No limiting for this robot -- it can't tip
+    xSlewed = chassisSpeeds.vxMetersPerSecond;            // No limiting for this robot -- it can't tip
+    ySlewed = chassisSpeeds.vyMetersPerSecond;            // No limiting for this robot -- it can't tip
+
+    // Discretize the movement to avoid unintended robot translation while robot is rotating
+    chassisSpeeds = ChassisSpeeds.discretize(xSlewed, ySlewed, omegaLimited, 0.02);
+
+    // convert back to swerve module states
+    desiredStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds, new Translation2d());
+    
     // Desaturate wheel speeds to a little below max speed.  It takes a while to accelerate to
     // max speed, so reducing the max will help movement accuracy.
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, SwerveConstants.kMaxSpeedMetersPerSecond);
 
-    // Convert states to chassisspeeds
-    ChassisSpeeds chassisSpeeds = kDriveKinematics.toChassisSpeeds(desiredStates);
-    double xSlewed, omegaLimited, ySlewed;
-    omegaLimited = chassisSpeeds.omegaRadiansPerSecond;
-    xSlewed = chassisSpeeds.vxMetersPerSecond;
-    ySlewed = chassisSpeeds.vyMetersPerSecond;
-
-    // convert back to swervem module states
-    desiredStates = kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSlewed, ySlewed, omegaLimited), new Translation2d());
-    
     swerveFrontLeft.setDesiredState(desiredStates[0], isOpenLoop);
     swerveFrontRight.setDesiredState(desiredStates[1], isOpenLoop);
     swerveBackLeft.setDesiredState(desiredStates[2], isOpenLoop);
