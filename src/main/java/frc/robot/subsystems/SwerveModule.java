@@ -206,7 +206,7 @@ public class SwerveModule {
  		// Start with factory default CANCoder configuration
     turningCanCoderConfig = new CANcoderConfiguration();			// Factory default configuration
     turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
-    turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;  //TODO Determine which direction is reversed
+    turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
 
     // Configure the swerve module motors and encoders
     configSwerveModule();
@@ -366,7 +366,6 @@ public class SwerveModule {
     // Set drive motor velocity or percent output
     if(isOpenLoop){
       setDriveMotorVoltageOutput(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond));
-      //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
     }
     else {
       driveMotor.setControl(driveVelocityControl
@@ -375,7 +374,7 @@ public class SwerveModule {
     }
 
     // Set turning motor target angle
-    // TODO Determine the right way to implement this code.  Make it selectable by a boolean parameter to setDesiredState?
+    // TODO Determine the right way to implement code to eliminate wheel jitter when sitting idle.  Make it selectable by a boolean parameter to setDesiredState?
     // Prevent rotating module if speed is less then 1%. Prevents Jittering.
     // double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.kMaxSpeedMetersPerSecond * 0.01)) 
     //   ? getTurningEncoderDegrees() : desiredState.angle.getDegrees(); 

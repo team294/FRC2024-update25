@@ -192,7 +192,7 @@ public class FileLog {
 		// 	if (rotation >= 25) rotation = 0;
 		// } else {
 		// 	if (rotation >= 10) rotation = 0;
-		// } TODO add back in when we do log levels
+		// } TODO add back in when we implement log levels
 	}
 
 	/**
