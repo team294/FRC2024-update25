@@ -84,7 +84,7 @@ public class RobotContainer {
     autoFactory = new AutoFactory(
       driveTrain::getPose,
       driveTrain::resetPose,
-      driveTrain::choreoFollowTrajectory,
+      driveTrain.choreoFollowTrajectory(),
       false, 
       driveTrain);
 

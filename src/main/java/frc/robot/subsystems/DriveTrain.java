@@ -46,6 +46,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import java.lang.ref.Reference;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 
 public class DriveTrain extends SubsystemBase implements Loggable {
@@ -97,10 +98,6 @@ public class DriveTrain extends SubsystemBase implements Loggable {
   private final Field2d field = new Field2d();    // Field to dispaly on Shuffleboard
   private double speedAvg;        // Average speed of the robot chassis
 
-  // controllers for choreo follower
-  private final PIDController xController = new PIDController(Constants.TrajectoryConstants.kPXController, 0.0, 0.0);
-  private final PIDController yController = new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0);
-  private final PIDController rotationController = new PIDController(Constants.TrajectoryConstants.kPThetaController, 0.0, 0.0);
 
   //Slew rate limiter
   // private boolean elevatorUpPriorIteration = false;       // Tracking for elevator position from prior iteration
@@ -456,30 +453,38 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    * based on the current sample and pose
    * @param sample the current SwerveSample of the trajectory
    */
-  public void choreoFollowTrajectory(SwerveSample sample){
-    double xFF = sample.vx;
-    double yFF = sample.vy;
-    double rotationFF = sample.omega;
+  public Consumer<SwerveSample> choreoFollowTrajectory(){
+    final PIDController xController = new PIDController(Constants.TrajectoryConstants.kPXController, 0.0, 0.0);
+    final PIDController yController = new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0);
+    final PIDController rotationController = 
+        new PIDController(Constants.TrajectoryConstants.kPThetaController, 0.0, 0.0);
+    rotationController.enableContinuousInput(-Math.PI, Math.PI);
 
-    double xFeedback = xController.calculate(getPose().getX(), sample.x);
-    double yFeedback = yController.calculate(getPose().getY(), sample.y);
-    double rotationFeedback = 
-        rotationController.calculate(getPose().getRotation().getRadians(), sample.heading);
-    
-    log.writeLog(false, "choreoTrajectoryFollower", "State", 
-      "Time", sample.t,
-      "Traj X", sample.x,
-      "Traj Y", sample.y,
-      "Traj Vel", Math.hypot(sample.vx, sample.vy),
-      "Traj VelAng", sample.omega,
-      "Target rot", sample.heading,
-      "Robot X", getPose().getTranslation().getX(),
-      "Robot Y", getPose().getTranslation().getY(),
-      "Robot Vel", Math.hypot(getRobotSpeeds().vxMetersPerSecond, getRobotSpeeds().vyMetersPerSecond),
-      "Robot VelAng", Math.toDegrees(Math.atan2(getRobotSpeeds().vyMetersPerSecond, getRobotSpeeds().vxMetersPerSecond)),
-      "Robot rot", getPose().getRotation().getDegrees());
-    
-    drive(xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, true, false);
+    return (sample) -> {
+      double xFF = sample.vx;
+      double yFF = sample.vy;
+      double rotationFF = sample.omega;
+
+      double xFeedback = xController.calculate(getPose().getX(), sample.x);
+      double yFeedback = yController.calculate(getPose().getY(), sample.y);
+      double rotationFeedback = 
+          rotationController.calculate(getPose().getRotation().getRadians(), sample.heading);
+      
+      log.writeLog(false, "choreoTrajectoryFollower", "State", 
+        "Time", sample.t,
+        "Traj X", sample.x,
+        "Traj Y", sample.y,
+        "Traj Vel", Math.hypot(sample.vx, sample.vy),
+        "Traj VelAng", sample.omega,
+        "Target rot", sample.heading,
+        "Robot X", getPose().getTranslation().getX(),
+        "Robot Y", getPose().getTranslation().getY(),
+        "Robot Vel", Math.hypot(getRobotSpeeds().vxMetersPerSecond, getRobotSpeeds().vyMetersPerSecond),
+        "Robot VelAng", Math.toDegrees(Math.atan2(getRobotSpeeds().vyMetersPerSecond, getRobotSpeeds().vxMetersPerSecond)),
+        "Robot rot", getPose().getRotation().getDegrees());
+      
+      drive(xFF + xFeedback, yFF + yFeedback, rotationFF + rotationFeedback, true, false);  
+    };
   }
 
 

@@ -338,6 +338,18 @@
               "topic": "/CameraPublisher/photonvision_Port_1186_Output_MJPEG_Server",
               "period": 0.06
             }
+          },
+          {
+            "title": "Choreo Alerts",
+            "x": 128.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Choreo Alerts",
+              "period": 0.06
+            }
           }
         ]
       }
