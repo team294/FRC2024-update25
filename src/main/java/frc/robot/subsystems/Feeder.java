@@ -205,8 +205,12 @@ public class Feeder extends SubsystemBase implements Loggable{
       SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
     }
 
-    if (isPiecePresent()) {led.setHasPiece();}
-    else {led.clearHasPiece();}
+    if (isPiecePresent()) { // if we have a piece, update variable to true
+      led.setHasPiece();
+    }
+    else { // if we don't, update variable to false
+      led.clearHasPiece();
+    }
   }
 
   /**

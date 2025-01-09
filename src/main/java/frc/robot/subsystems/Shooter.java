@@ -309,12 +309,17 @@ public class Shooter extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
       
-      if (isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) {led.setshooterVelocityWithinError();}
-      else if (getTopShooterTargetRPM() > 0)  {
+      if (isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) { // are we at the right velocity to shoot?
+        led.setshooterVelocityWithinError();
+      }
+      else if (getTopShooterTargetRPM() > 0)  { // how close are we to the right velocity?
         led.setShooterRPMAboveZero();
         led.setShooterPercent(getTopShooterVelocity() / getTopShooterTargetRPM());
       }
-      else {led.clearshooterVelocityWithinError();}
+      else { // not trying to shoot, don't check for anything
+        led.clearshooterVelocityWithinError();
+        led.clearShooterRPMAboveZero();
+      }
    }
   }
 
