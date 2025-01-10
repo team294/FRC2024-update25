@@ -450,7 +450,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
 
    /**
    * function used in choreo autos that takes a swerve sample and drives the robot
-   * based on the current sample and pose
+   * based on the current field relative sample and pose
    * @param sample the current SwerveSample of the trajectory
    */
   public Consumer<SwerveSample> choreoFollowTrajectory(){

@@ -1,16 +1,27 @@
 package frc.robot.utilities;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+
+import java.util.Optional;
+
+import choreo.Choreo;
 import choreo.auto.AutoFactory;
 import choreo.auto.AutoRoutine;
 import choreo.auto.AutoTrajectory;
+import choreo.trajectory.SwerveSample;
+import choreo.trajectory.Trajectory;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.Constants.CoordType;
 import frc.robot.Constants.StopType;
+import frc.robot.commands.ChoreoFollower;
 import frc.robot.commands.DriveResetPose;
 import frc.robot.commands.DriveTrajectory;
 import frc.robot.commands.Autos.*;
@@ -50,6 +61,7 @@ public class AutoSelection {
 	public static final int SourceWallMobilityAuto = 19;
 	public static final int AmpThreePieceCenter = 20;
 	public static final int ChoreoTrajectory = 21;
+	public static final int ChoreoTrajectoryWithFollower = 22;
 
 	private final AllianceSelection allianceSelection;
 	private final TrajectoryCache trajectoryCache;
@@ -85,6 +97,7 @@ public class AutoSelection {
 		autoChooser.addOption("SourceMobilityIntoSide", SourceWallMobilityAuto);
 		autoChooser.addOption("AmpThreePieceCenter", AmpThreePieceCenter);
 		autoChooser.addOption("ChoreoTrajectory", ChoreoTrajectory);
+		autoChooser.addOption("ChoreoTrajectoryWithFollower", ChoreoTrajectoryWithFollower);
 
 
 
@@ -230,6 +243,26 @@ public class AutoSelection {
 			autonomousCommandMain = new SequentialCommandGroup(
 				autoFactory.resetOdometry("Test-Path"),
 				autoFactory.trajectoryCmd("Test-Path"));
+		}
+
+		else if (autoPlan == ChoreoTrajectoryWithFollower){
+			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory With Follower command");
+			Optional<Trajectory<SwerveSample>> loadTrajectory = Choreo.loadTrajectory("Test-Path");
+			Trajectory<SwerveSample> Trajectory = loadTrajectory.get();
+			if(!loadTrajectory.isEmpty()){
+				autonomousCommandMain = new SequentialCommandGroup(
+					new DriveResetPose(() -> ((allianceSelection.getAlliance() == Alliance.Red) ? Trajectory.getInitialPose(true).get() : Trajectory.getInitialPose(false).get()), false, driveTrain, log),
+					new ChoreoFollower(Trajectory,
+						new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0), 
+						new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0), 
+						new PIDController(Constants.TrajectoryConstants.kPThetaController, 0.0, 0.0), 
+						(speeds) -> driveTrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true, false),
+						() -> driveTrain.getPose(),
+						() -> allianceSelection.getAlliance() == Alliance.Red, 
+						driveTrain, 
+						log)
+				);
+			}
 		}
 
 		else if (autonomousCommandMain == null) {
