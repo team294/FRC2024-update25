@@ -253,7 +253,7 @@ public class AutoSelection {
 				autonomousCommandMain = new SequentialCommandGroup(
 					new DriveResetPose(() -> ((allianceSelection.getAlliance() == Alliance.Red) ? Trajectory.getInitialPose(true).get() : Trajectory.getInitialPose(false).get()), false, driveTrain, log),
 					new ChoreoFollower(Trajectory,
-						new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0), 
+						new PIDController(Constants.TrajectoryConstants.kPXController, 0.0, 0.0), 
 						new PIDController(Constants.TrajectoryConstants.kPYController, 0.0, 0.0), 
 						new PIDController(Constants.TrajectoryConstants.kPThetaController, 0.0, 0.0), 
 						(speeds) -> driveTrain.drive(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, speeds.omegaRadiansPerSecond, true, false),
