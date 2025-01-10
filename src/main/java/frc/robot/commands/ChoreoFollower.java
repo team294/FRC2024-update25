@@ -68,6 +68,7 @@ public class ChoreoFollower extends Command {
   public void initialize() {
     log.writeLog(false, "ChoreoCommandFollower", "Start", 
     "Is Flipped", mirrorTrajectory.getAsBoolean());
+    rotationController.enableContinuousInput(-Math.PI, Math.PI);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
