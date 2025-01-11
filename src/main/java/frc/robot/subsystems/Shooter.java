@@ -28,6 +28,7 @@ import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
 
+import frc.robot.subsystems.LED.LEDbools;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
@@ -70,6 +71,10 @@ public class Shooter extends SubsystemBase implements Loggable {
   private boolean velocityControlOn = false;
   private double setpointRPMTop;
   private double setpointRPMBottom;
+
+  private LEDbools shooterVelocityWithinError = LEDbools.shooterVelocityWithinError;
+  private LEDbools shooterRPMAboveZero = LEDbools.shooterRPMAboveZero;
+  private LEDbools shooterPercent = LEDbools.shooterPercent;
   
   /**
    * Create the shooter subsystem
@@ -309,16 +314,16 @@ public class Shooter extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
       
-      if (isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) { // are we at the right velocity to shoot?
-        led.setshooterVelocityWithinError();
+      if ((isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && !shooterVelocityWithinError.getBooleanValue()) { // are we at the right velocity to shoot
+        shooterVelocityWithinError.setValue(true);
       }
-      else if (getTopShooterTargetRPM() > 0)  { // how close are we to the right velocity?
-        led.setShooterRPMAboveZero();
-        led.setShooterPercent(getTopShooterVelocity() / getTopShooterTargetRPM());
+      else if ((getTopShooterTargetRPM() > 0) && !shooterRPMAboveZero.getBooleanValue())  { // how close are we to the right velocity?
+        shooterRPMAboveZero.setValue(true);
+        shooterPercent.setValue(getTopShooterVelocity() / getTopShooterTargetRPM());
       }
-      else { // not trying to shoot, don't check for anything
-        led.clearshooterVelocityWithinError();
-        led.clearShooterRPMAboveZero();
+      else if (shooterVelocityWithinError.getBooleanValue() || shooterRPMAboveZero.getBooleanValue()) { // not trying to shoot, don't check for anything
+        shooterVelocityWithinError.setValue(false);
+        shooterRPMAboveZero.setValue(false);
       }
    }
   }

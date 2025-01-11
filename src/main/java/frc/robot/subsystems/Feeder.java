@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.CANifier.LEDChannel;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
+import frc.robot.subsystems.LED.LEDbools;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
@@ -55,6 +57,8 @@ public class Feeder extends SubsystemBase implements Loggable{
   private boolean velocityControlOn = false;
   private double setpointRPM;
   private double setpointPercent;
+
+  private LEDbools hasPiece = LEDbools.hasPiece;
 
   // Piece sensor inside the intake 
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);
@@ -205,11 +209,11 @@ public class Feeder extends SubsystemBase implements Loggable{
       SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
     }
 
-    if (isPiecePresent()) { // if we have a piece, update variable to true
-      led.setHasPiece();
+    if (isPiecePresent() && !hasPiece.getBooleanValue()) { // if we have a piece, update variable to true
+      hasPiece.setValue(true);
     }
-    else { // if we don't, update variable to false
-      led.clearHasPiece();
+    else if (!isPiecePresent() && hasPiece.getBooleanValue()) { // if we don't, update variable to false
+      hasPiece.setValue(false);
     }
   }
 

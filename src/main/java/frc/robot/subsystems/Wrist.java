@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.WristConstants.WristAngle;
 import frc.robot.Constants.WristConstants.WristRegion;
+import frc.robot.subsystems.LED.LEDbools;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.MathBCR;
@@ -91,6 +92,8 @@ public class Wrist extends SubsystemBase implements Loggable{
   private double safeAngle;         // current wrist target on position control on the Falcon motor (if the Falcon is in position mode)
 
   private double ampAngleOffset = 0; 
+
+  private LEDbools calibrated = LEDbools.wristCalibrated;
   
   public Wrist(FileLog log, LED led) {
     this.log = log;
@@ -667,8 +670,12 @@ public class Wrist extends SubsystemBase implements Loggable{
     //   updateWristLog(true);
     // }
 
-  if (wristCalibrated) {led.setWristCalibrated();}
-  else {led.clearWristCalibrated();}
+  if (wristCalibrated && !calibrated.getBooleanValue()) {
+    calibrated.setValue(true);
+  }
+  else if (!wristCalibrated) {
+    calibrated.setValue(false);
+  }
     
   }
  

@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.BCRColor;
 import frc.robot.Constants.LEDConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.LEDConstants.*;
 import frc.robot.utilities.BCRRobotState;
 import frc.robot.utilities.FileLog;
@@ -33,12 +32,41 @@ public class LED extends SubsystemBase {
   private Timer matchTimer;
   private Timer pieceTimer = new Timer();
   private boolean shouldClear;
-  private boolean isRainbow;
-  private boolean hasPiece;
-  private boolean shooterVelocityWithinError;
-  private boolean shooterRPMAboveZero;
-  private double shooterPercent;
   private boolean wristCalibrated;
+  public enum LEDbools {
+    isRainbow(false),
+    hasPiece(false),
+    shooterVelocityWithinError(false),
+    shooterRPMAboveZero(false),
+    wristCalibrated(false),
+    shooterPercent(0.0);
+    
+    private boolean bool;
+    private LEDbools(boolean b) {
+      this.bool = b;
+    }
+
+    private double doub;
+    private LEDbools(double d) {
+      this.doub = d;
+    }
+
+    public boolean getBooleanValue() {
+      return bool;
+    }
+
+    public double getDoubleValue() {
+      return doub;
+    }
+
+    public void setValue(boolean b) {
+      this.bool = b;
+    }
+
+    public void setValue(double d) {
+      this.doub = d;
+    }
+  }
 
   // private Color[] accuracyDisplayPattern = {Color.kRed, Color.kRed};
   private HashMap<LEDSegmentRange, LEDSegment> segments;
@@ -59,11 +87,6 @@ public class LED extends SubsystemBase {
     this.matchTimer = matchTimer;
     this.shouldClear = false;
     this.log = log;
-    this.isRainbow = false;
-    this.hasPiece = false;
-    this.shooterVelocityWithinError = false;
-    this.shooterRPMAboveZero = false;
-    this.shooterPercent = 0;
     logRotationKey = log.allocateLogRotation();
 
     // this.accuracyDisplayThreshold = 35;
@@ -89,11 +112,6 @@ public class LED extends SubsystemBase {
     this.currentState = BCRRobotState.State.IDLE;
     this.shouldClear = false;
     this.log = log;
-    this.isRainbow = false;
-    this.hasPiece = false;
-    this.shooterVelocityWithinError = false;
-    this.shooterRPMAboveZero = false;
-    this.shooterPercent = 0;
     logRotationKey = log.allocateLogRotation();
 
     // this.accuracyDisplayThreshold = 35;
@@ -103,51 +121,6 @@ public class LED extends SubsystemBase {
     for (LEDSegmentRange segment : LEDSegmentRange.values()) {
       segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
     }
-  }
-
-  public void setRainbow() {
-    isRainbow = true;
-  }
-
-  public void clearRainbow() {
-    isRainbow = false;
-  }
-
-  public void setHasPiece() {
-    hasPiece = true;
-    pieceTimer.stop();
-  }
-
-  public void clearHasPiece() {
-    hasPiece = false;
-  }
-  
-  public void setshooterVelocityWithinError() {
-    shooterVelocityWithinError = true;
-  }
-
-  public void clearshooterVelocityWithinError() {
-    shooterVelocityWithinError = false;
-  }
-
-  public void setShooterRPMAboveZero() {
-    shooterRPMAboveZero = true;
-  }
-
-  public void clearShooterRPMAboveZero() {
-    shooterRPMAboveZero = false;
-  }
-
-  public void setShooterPercent (double percent) {
-    shooterPercent = percent;
-  }
-
-  public void setWristCalibrated() {
-    wristCalibrated = true;
-  }
-
-  public void clearWristCalibrated() {
-    wristCalibrated = false;
   }
 
   /** Get the subsystem's name
@@ -335,7 +308,7 @@ public class LED extends SubsystemBase {
     // Set LEDs to match the state, as defined in Constants.BCRColor
     switch (currentState) {
     case IDLE:
-      if (hasPiece) {
+      if (LEDbools.hasPiece.getBooleanValue()) {
         pieceTimer.start();
         if (pieceTimer.get() >= .5) {
           pieceTimer.stop();
@@ -345,14 +318,14 @@ public class LED extends SubsystemBase {
           pieceTimer.stop();
           pieceTimer.reset();
       }
-      if (hasPiece) {
-        if (shooterVelocityWithinError && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
+      if (LEDbools.hasPiece.getBooleanValue()) {
+        if (LEDbools.shooterVelocityWithinError.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
           setAnimation(new Color(0, 255, 0), segment);  // rgb instead of kGreen due to error (kGreen is yellow for some reason)
-        } else if (shooterRPMAboveZero && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
+        } else if (LEDbools.shooterRPMAboveZero.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
           Color[] segmentPattern = new Color[segment.count];
           if (segment == LEDSegmentRange.StripLeft) {
             for (int i = 0; i < segment.count; i++) {
-              if (i >= (1.0 - shooterPercent) * segment.count) {
+              if (i >= (1.0 - LEDbools.shooterPercent.getDoubleValue()) * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason 
@@ -360,7 +333,7 @@ public class LED extends SubsystemBase {
             }
           } else if (segment == LEDSegmentRange.StripRight) {
             for (int i = 0; i < segment.count; i++) {
-              if (i <= shooterPercent * segment.count) {
+              if (i <= LEDbools.shooterPercent.getDoubleValue() * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason
@@ -381,7 +354,7 @@ public class LED extends SubsystemBase {
       break;
     case SHOOTING:
       setAnimation(BCRColor.SHOOTING, segment);
-      clearHasPiece();
+      LEDbools.hasPiece.setValue(false);
       break;
     }
   }
@@ -391,7 +364,7 @@ public class LED extends SubsystemBase {
    */
   private void displayLEDs() {
     for (LEDSegmentRange segmentKey : segments.keySet()) {
-      if (isRainbow && segmentKey == LEDSegmentRange.StripHorizontal) { continue; }
+      if (LEDbools.isRainbow.getBooleanValue() && segmentKey == LEDSegmentRange.StripHorizontal) { continue; }
       // Display this segments
       LEDSegment segment = segments.get(segmentKey);
       setPattern(segment.getCurrentFrame(), segmentKey);
@@ -473,7 +446,7 @@ public class LED extends SubsystemBase {
 
       displayLEDs();
       if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
-        clearHasPiece();
+        LEDbools.hasPiece.setValue(false);
       }
     }
   }
