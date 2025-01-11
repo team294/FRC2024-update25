@@ -87,7 +87,7 @@ public class RobotContainer {
       driveTrain.choreoFollowTrajectory(),
       false, 
       driveTrain);
-    autoFactory.cache().loadTrajectory("Test-Path");
+    autoFactory.cache().loadTrajectory("TestPath");
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
     driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
 

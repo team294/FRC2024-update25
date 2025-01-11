@@ -52,6 +52,7 @@ public class ChoreoFollower extends Command {
    * @param log LogFile for logging
    */
   public ChoreoFollower(Trajectory<SwerveSample> trajectory, PIDController xController, PIDController yController, PIDController rotationController, Consumer<ChassisSpeeds> outputChassisSpeeds, Supplier<Pose2d> poseSupplier, BooleanSupplier mirrorTrajectory, DriveTrain driveTrain, FileLog log) {
+    this.trajectory = trajectory;
     this.xController = xController;
     this.yController = yController;
     this.rotationController = rotationController;
@@ -66,6 +67,7 @@ public class ChoreoFollower extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.timer = new Timer();
     log.writeLog(false, "ChoreoCommandFollower", "Start", 
     "Is Flipped", mirrorTrajectory.getAsBoolean());
     rotationController.enableContinuousInput(-Math.PI, Math.PI);

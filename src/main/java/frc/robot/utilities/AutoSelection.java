@@ -241,13 +241,13 @@ public class AutoSelection {
 		else if (autoPlan == ChoreoTrajectory){
 			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory");
 			autonomousCommandMain = new SequentialCommandGroup(
-				autoFactory.resetOdometry("Test-Path"),
-				autoFactory.trajectoryCmd("Test-Path"));
+				autoFactory.resetOdometry("TestPath"),
+				autoFactory.trajectoryCmd("TestPath"));
 		}
 
 		else if (autoPlan == ChoreoTrajectoryWithFollower){
 			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory With Follower command");
-			Optional<Trajectory<SwerveSample>> loadTrajectory = Choreo.loadTrajectory("Test-Path");
+			Optional<Trajectory<SwerveSample>> loadTrajectory = Choreo.loadTrajectory("TestPath");
 			Trajectory<SwerveSample> Trajectory = loadTrajectory.get();
 			if(!loadTrajectory.isEmpty()){
 				autonomousCommandMain = new SequentialCommandGroup(
