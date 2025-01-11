@@ -550,7 +550,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber("Drive X Velocity", robotSpeeds.vxMetersPerSecond);
       SmartDashboard.putNumber("Drive Y Velocity", robotSpeeds.vyMetersPerSecond);
       SmartDashboard.putBoolean("Drive isGyroReading", isGyroReading());
-      SmartDashboard.putBoolean("Drive isCoastMode", isDriveModeCoast());
+      SmartDashboard.putBoolean("Drive isBrakeMode", !isDriveModeCoast());
       SmartDashboard.putNumber("Drive Raw Gyro", getGyroRaw());
       SmartDashboard.putNumber("Drive Gyro Rotation", getGyroRotation());
       SmartDashboard.putNumber("Drive AngVel", getAngularVelocity());

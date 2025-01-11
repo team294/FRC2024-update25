@@ -281,7 +281,7 @@
           {
             "title": "Field",
             "x": 1280.0,
-            "y": 512.0,
+            "y": 640.0,
             "width": 384.0,
             "height": 256.0,
             "type": "Field",
@@ -1067,7 +1067,7 @@
           {
             "title": "Drive Percent Speed",
             "x": 1408.0,
-            "y": 256.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 384.0,
             "type": "List Layout",
@@ -1142,6 +1142,49 @@
                   "period": 0.06,
                   "data_type": "double",
                   "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Toggle Coast",
+            "x": 640.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "LEFT"
+            },
+            "children": [
+              {
+                "title": " ",
+                "x": 640.0,
+                "y": 768.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive Toggle Coast",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "isBrakeMode",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive isBrakeMode",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
                 }
               }
             ]
