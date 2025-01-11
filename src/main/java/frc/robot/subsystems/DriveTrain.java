@@ -657,41 +657,41 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     if (camera.hasInit()) {
       PhotonPipelineResult latestResult = camera.getLatestResult();
       if (latestResult != null) {
-        PhotonPipelineResult camResult = latestResult;
-        Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), camResult);
+        Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), latestResult);
         if (result.isPresent()) {
-          double lastGoodX = -9999;
-          double lastGoodY = -9999;
+          double lastUpdatedX = -9999;
+          double lastUpdatedY = -9999;
+          boolean updatedVisionPos = false;
           try {
             EstimatedRobotPose camPose = result.get();
-            if (camResult.hasTargets()) {
-              PhotonTrackedTarget bestTarget = camResult.getBestTarget();
+            if (latestResult.hasTargets()) {
+              PhotonTrackedTarget bestTarget = latestResult.getBestTarget();
               if (bestTarget != null) {
                 if (bestTarget.getBestCameraToTarget().getX() < 3) {
                   poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+                  lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
+                  lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
+                  updatedVisionPos = true;
                 }
                 else if (bestTarget.getBestCameraToTarget().getX() < 7) {
                   poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, farMatrix);
+                  lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
+                  lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
+                  updatedVisionPos = true;
                 }
-                SmartDashboard.putNumber("Vision Pos X", camPose.estimatedPose.toPose2d().getX());
-                SmartDashboard.putNumber("Vision Pos Y", camPose.estimatedPose.toPose2d().getY());
-                SmartDashboard.putBoolean("Vision Pos Updated", true);
-                lastGoodX = camPose.estimatedPose.toPose2d().getX();
-                lastGoodY = camPose.estimatedPose.toPose2d().getY();
-              } else {
-                SmartDashboard.putNumber("Vision Pos X", lastGoodX);
-                SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
-                SmartDashboard.putBoolean("Vision Pos Updated", false);
               }
-            } else {
-              SmartDashboard.putNumber("Vision Pos X", lastGoodX);
-              SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
-              SmartDashboard.putBoolean("Vision Pos Updated", false);
             }
+            
           } catch (NoSuchElementException e) {
-            SmartDashboard.putNumber("Vision Pos X", lastGoodX);
-            SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
-            SmartDashboard.putBoolean("Vision Pos Updated", false);
+            //TODO: determine how often this happens
+          } finally {
+            if (lastUpdatedX != -9999) {
+              SmartDashboard.putNumber("Vision Pos X", lastUpdatedX);
+            }
+            if (lastUpdatedY != -9999) {
+              SmartDashboard.putNumber("Vision Pos Y", lastUpdatedY);
+            }
+            SmartDashboard.putBoolean("Vision Pos Updated", updatedVisionPos);
           }
         }
       }
