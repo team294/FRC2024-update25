@@ -278,6 +278,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
 
     SmartDashboard.putString("Drive Mode", setCoast ? "Coast" : "Brake");
   }
+
   /**
    * Gets the drive train mode (coast vs brake).
    * @return Returns true if in motors are in coast, or false if in brake.
@@ -287,6 +288,18 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       swerveBackLeft.isMotorModeCoast() && swerveBackLeft.isMotorModeCoast();
   }
 
+  /**
+   * Sets the drive motors to FOC or trapezoidal commuatation mode
+   * <p> <b>Note</b> This takes effect for the <b>next</b> request sent to the motor.
+   * @param setFOC true = FOC mode, false = trapezoidal mode
+   */
+  public void setDriveMotorsFOC(boolean setFOC) {
+    swerveFrontLeft.setDriveMotorFOC(setFOC);
+    swerveFrontRight.setDriveMotorFOC(setFOC);
+    swerveBackLeft.setDriveMotorFOC(setFOC);
+    swerveBackRight.setDriveMotorFOC(setFOC);
+  }
+  
   /**
    * @param percentOutput Percent output to motor, -1 to +1
    */
