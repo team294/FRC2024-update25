@@ -13,7 +13,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -41,6 +43,7 @@ import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
@@ -519,6 +522,10 @@ public class DriveTrain extends SubsystemBase implements Loggable {
 
     // update 
     updateOdometry();
+
+    //Updates position with no odometry
+
+    updateVision(); 
     
     if(fastLogging || log.isMyLogRotation(logRotationKey)) {
       updateDriveLog(false);
@@ -632,6 +639,51 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       field.setRobotPose(new Pose2d(x, y, rot));
     } else field.setRobotPose(poseEstimator.getEstimatedPosition());
   }  
+
+  public void updateVision() {
+    if (camera.hasInit()) {
+      PhotonPipelineResult latestResult = camera.getLatestResult();
+      if (latestResult != null) {
+        PhotonPipelineResult camResult = latestResult;
+        Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), camResult);
+        if (result.isPresent()) {
+          double lastGoodX = -9999;
+          double lastGoodY = -9999;
+          try {
+            EstimatedRobotPose camPose = result.get();
+            if (camResult.hasTargets()) {
+              PhotonTrackedTarget bestTarget = camResult.getBestTarget();
+              if (bestTarget != null) {
+                if (bestTarget.getBestCameraToTarget().getX() < 3) {
+                  poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+                }
+                else if (bestTarget.getBestCameraToTarget().getX() < 7) {
+                  poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, farMatrix);
+                }
+                SmartDashboard.putNumber("Vision Pos X", camPose.estimatedPose.toPose2d().getX());
+                SmartDashboard.putNumber("Vision Pos Y", camPose.estimatedPose.toPose2d().getY());
+                SmartDashboard.putBoolean("Vision Pos Updated", true);
+                lastGoodX = camPose.estimatedPose.toPose2d().getX();
+                lastGoodY = camPose.estimatedPose.toPose2d().getY();
+              } else {
+                SmartDashboard.putNumber("Vision Pos X", lastGoodX);
+                SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
+                SmartDashboard.putBoolean("Vision Pos Updated", false);
+              }
+            } else {
+              SmartDashboard.putNumber("Vision Pos X", lastGoodX);
+              SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
+              SmartDashboard.putBoolean("Vision Pos Updated", false);
+            }
+          } catch (NoSuchElementException e) {
+            SmartDashboard.putNumber("Vision Pos X", lastGoodX);
+            SmartDashboard.putNumber("Vision Pos Y", lastGoodY);
+            SmartDashboard.putBoolean("Vision Pos Updated", false);
+          }
+        }
+      }
+    }
+  }
 
   public void cameraInit() {
     camera.init();

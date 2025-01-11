@@ -176,7 +176,6 @@ public class RobotContainer {
     // Vision
     SmartDashboard.putData("Enable Using Vision for Odometry", new VisionOdometryStateSet(true, driveTrain, log));
     SmartDashboard.putData("Disable Using Vision for Odometry", new VisionOdometryStateSet(false, driveTrain, log));
-    SmartDashboard.putData("Location Reading Test", new DisplayPosition(driveTrain, log)); // Displays location based on AprilTag
   }
 
   /**
