@@ -14,7 +14,6 @@ import frc.robot.utilities.FileLog;
 public class DrivePercentSpeed extends Command {
   private DriveTrain driveTrain;
   private FileLog log;
-
   // Parameters
   private double angleFacing, percentSpeed, maxDistance;
   private boolean fromShuffleboard;

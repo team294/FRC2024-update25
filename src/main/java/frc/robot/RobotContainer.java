@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -25,6 +27,7 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.Constants.StopType;
 import frc.robot.Constants.SwerveConstants;
 import frc.robot.Constants.TrajectoryConstants;
+import frc.robot.Constants.VisionConstants.PhotonVisionConstants;
 import frc.robot.Constants.WristConstants.WristAngle;
 import frc.robot.commands.*;
 import frc.robot.commands.Autos.*;
@@ -35,6 +38,9 @@ import frc.robot.utilities.*;
 import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
 import static edu.wpi.first.wpilibj2.command.Commands.*;
+
+import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -170,6 +176,7 @@ public class RobotContainer {
     // Vision
     SmartDashboard.putData("Enable Using Vision for Odometry", new VisionOdometryStateSet(true, driveTrain, log));
     SmartDashboard.putData("Disable Using Vision for Odometry", new VisionOdometryStateSet(false, driveTrain, log));
+    SmartDashboard.putData("Location Reading Test", new DisplayPosition(driveTrain, log)); // Displays location based on AprilTag
   }
 
   /**
