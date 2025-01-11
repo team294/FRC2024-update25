@@ -4,8 +4,13 @@
 
 package frc.robot;
 
+<<<<<<< HEAD
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+=======
+import com.ctre.phoenix6.SignalLogger;
+
+>>>>>>> main
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -20,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+
 import frc.robot.Constants.CoordType;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OIConstants;
@@ -37,7 +44,6 @@ import frc.robot.subsystems.*;
 import frc.robot.utilities.*;
 import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -133,6 +139,8 @@ public class RobotContainer {
     SmartDashboard.putData("Wrist Nudge Angle", new WristNudgeAngle(wrist, log));
   
     // Drive base commands
+    SmartDashboard.putData("Drive FOC On", new DriveSetFOC(true, driveTrain, log));
+    SmartDashboard.putData("Drive FOC Off", new DriveSetFOC(false, driveTrain, log));
     SmartDashboard.putData("Drive Toggle Coast", new DriveToggleCoastMode(driveTrain, log));
     SmartDashboard.putData("Drive Reset Pose", new DriveResetPose(driveTrain, log));
     SmartDashboard.putData("Drive To Pose", new DriveToPose(driveTrain, log));
@@ -142,7 +150,7 @@ public class RobotContainer {
       TrajectoryConstants.maxPositionErrorMeters, TrajectoryConstants.maxThetaErrorDegrees, 
       false, false, driveTrain, log) );
 
-    SmartDashboard.putData("Drive Calibration", new DriveCalibration(0.5, 5.0, 0.1, driveTrain, log));
+    SmartDashboard.putData("Drive Calibration", new DriveCalibration(0.0, 0.5, 5.0, 0.1, driveTrain, log));
     SmartDashboard.putData("Drive Turn Calibration", new DriveTurnCalibration(0.2, 5.0, 0.2 / 5.0, driveTrain, log));
     SmartDashboard.putData("Drive Percent Speed", new DrivePercentSpeed(driveTrain, log));
 
@@ -416,6 +424,7 @@ public class RobotContainer {
     driveTrain.setVisionForOdometryState(true);
 
     matchTimer.stop();
+    SignalLogger.stop();
   }
 
   /**

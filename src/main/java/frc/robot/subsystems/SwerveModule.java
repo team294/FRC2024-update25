@@ -46,8 +46,8 @@ public class SwerveModule {
   private final TalonFX driveMotor;
 	private final TalonFXConfigurator driveMotorConfigurator;
 	private TalonFXConfiguration driveMotorConfig;
-	private VoltageOut driveVoltageControl = new VoltageOut(0.0);
-  private VelocityVoltage driveVelocityControl = new VelocityVoltage(0.0);
+	private VoltageOut driveVoltageControl = new VoltageOut(0.0).withEnableFOC(true);
+  private VelocityVoltage driveVelocityControl = new VelocityVoltage(0.0).withEnableFOC(true);
 
 	// Drive motor signals and sensors
 	private final StatusSignal<Voltage> driveMotorSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
@@ -154,7 +154,7 @@ public class SwerveModule {
     // Supply current limit is typically used to prevent breakers from tripping.
     driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
     driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 35.0;   // (amps) Lower limit for the current
-    driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 2.0;       // (sec) Threshold time.     Was 0.1s, changed to 2.0s
     driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // configure drive encoder
@@ -285,6 +285,17 @@ public class SwerveModule {
   public boolean isMotorModeCoast() {
     return isInCoastMode;
   }
+
+  /**
+   * Sets the drive motor to FOC or trapezoidal commuatation mode
+   * <p> <b>Note</b> This takes effect for the <b>next</b> request sent to the motor.
+   * @param setFOC true = FOC mode, false = trapezoidal mode
+   */
+  public void setDriveMotorFOC(boolean setFOC) {
+    driveVelocityControl = driveVelocityControl.withEnableFOC(setFOC);
+    driveVoltageControl = driveVoltageControl.withEnableFOC(setFOC);
+  }
+
 
   // ********** Main swerve module control methods
 
