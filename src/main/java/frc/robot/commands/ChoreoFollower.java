@@ -68,6 +68,7 @@ public class ChoreoFollower extends Command {
   @Override
   public void initialize() {
     this.timer = new Timer();
+    timer.restart();
     log.writeLog(false, "ChoreoCommandFollower", "Start", 
     "Is Flipped", mirrorTrajectory.getAsBoolean());
     rotationController.enableContinuousInput(-Math.PI, Math.PI);
