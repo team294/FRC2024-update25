@@ -9,6 +9,7 @@ import com.ctre.phoenix6.StatusSignal;
 // import com.ctre.phoenix6.configs.Pigeon2Configurator;
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
@@ -40,6 +41,7 @@ import frc.robot.utilities.*;
 
 // Vision imports
 import org.photonvision.EstimatedRobotPose;
+import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
@@ -657,7 +659,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     if (camera.hasInit()) {
       PhotonPipelineResult latestResult = camera.getLatestResult();
       if (latestResult != null) {
-        Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), latestResult);
+        Optional<EstimatedRobotPose> result = camera.getEstimatedVisionPose(latestResult);
         if (result.isPresent()) {
           double lastUpdatedX = -9999;
           double lastUpdatedY = -9999;

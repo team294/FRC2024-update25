@@ -4,13 +4,10 @@
 
 package frc.robot;
 
-<<<<<<< HEAD
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-=======
 import com.ctre.phoenix6.SignalLogger;
 
->>>>>>> main
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;

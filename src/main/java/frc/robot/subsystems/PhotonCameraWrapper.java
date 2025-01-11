@@ -26,6 +26,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class PhotonCameraWrapper extends SubsystemBase {
   public PhotonCamera photonCamera;
   public PhotonPoseEstimator photonPoseEstimator;
+  public PhotonPoseEstimator visionOnlyPoseEstimator;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private FileLog log;
   private boolean hasInit = false;
@@ -85,7 +86,7 @@ public class PhotonCameraWrapper extends SubsystemBase {
       aprilTagFieldLayout,
       PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
       PhotonVisionConstants.robotToCamBack);
-      
+    
     hasInit = true;
 
     log.writeLog(true, "PhotonCameraWrapper", "Init", "Done");
@@ -140,6 +141,23 @@ public class PhotonCameraWrapper extends SubsystemBase {
     } else {
       if(fastLogging || log.isMyLogRotation(logRotationKey)) {
         log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", false, "X", 0, "Y", 0);
+        SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+      }
+    }
+    return newPoseOptional;
+  }
+
+  public Optional<EstimatedRobotPose> getEstimatedVisionPose(PhotonPipelineResult latestResult) {
+    var newPoseOptional = photonPoseEstimator.update(latestResult);
+    if (newPoseOptional.isPresent()) {
+      EstimatedRobotPose newPose = newPoseOptional.get();
+      if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+        log.writeLog(false, "PhotonCameraWrapper", "getEstimatedVisionPose", "IsConnected", photonCamera.isConnected(), "TagPresent", true, "X",newPose.estimatedPose.getX(),"Y",newPose.estimatedPose.getY());
+        SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+      }
+    } else {
+      if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+        log.writeLog(false, "PhotonCameraWrapper", "getEstimatedVisionPose", "IsConnected", photonCamera.isConnected(), "TagPresent", false, "X", 0, "Y", 0);
         SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
       }
     }
