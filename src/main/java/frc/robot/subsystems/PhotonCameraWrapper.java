@@ -81,12 +81,17 @@ public class PhotonCameraWrapper extends SubsystemBase {
       e.printStackTrace();
     }
     
-    // Create pose estimator
+    // Create pose estimators
     photonPoseEstimator = new PhotonPoseEstimator(
       aprilTagFieldLayout,
       PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
       PhotonVisionConstants.robotToCamBack);
     
+    visionOnlyPoseEstimator = new PhotonPoseEstimator(
+      aprilTagFieldLayout, 
+      PoseStrategy.AVERAGE_BEST_TARGETS,
+      PhotonVisionConstants.robotToCamBack);
+
     hasInit = true;
 
     log.writeLog(true, "PhotonCameraWrapper", "Init", "Done");
@@ -147,8 +152,14 @@ public class PhotonCameraWrapper extends SubsystemBase {
     return newPoseOptional;
   }
 
+  /**
+   * @return A pair of the fused camera observations to a single Pose2d on the
+  *         field, and the time
+  *         of the observation. Assumes a planar field and the robot is always
+  *         firmly on the ground. Uses average best targets pose strategy
+   */
   public Optional<EstimatedRobotPose> getEstimatedVisionPose(PhotonPipelineResult latestResult) {
-    var newPoseOptional = photonPoseEstimator.update(latestResult);
+    var newPoseOptional = visionOnlyPoseEstimator.update(latestResult);
     if (newPoseOptional.isPresent()) {
       EstimatedRobotPose newPose = newPoseOptional.get();
       if(fastLogging || log.isMyLogRotation(logRotationKey)) {

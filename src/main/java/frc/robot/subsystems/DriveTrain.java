@@ -655,13 +655,18 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     } else field.setRobotPose(poseEstimator.getEstimatedPosition());
   }  
 
+  /** Uses solely vision to periodically provide 
+   * an estimate of the position of the robot
+   * 
+   */
   public void updateVision() {
     if (camera.hasInit()) {
       PhotonPipelineResult latestResult = camera.getLatestResult();
       if (latestResult != null) {
         Optional<EstimatedRobotPose> result = camera.getEstimatedVisionPose(latestResult);
         if (result.isPresent()) {
-          double lastUpdatedX = -9999;
+          // Stores the last non-erroneous positions. -9999 indicates that the position should not be displayed due to there being no valid position found
+          double lastUpdatedX = -9999; 
           double lastUpdatedY = -9999;
           boolean updatedVisionPos = false;
           try {
@@ -687,13 +692,14 @@ public class DriveTrain extends SubsystemBase implements Loggable {
           } catch (NoSuchElementException e) {
             //TODO: determine how often this happens
           } finally {
+            // Displays the positions if they have valid values
             if (lastUpdatedX != -9999) {
-              SmartDashboard.putNumber("Vision Pos X", lastUpdatedX);
+              SmartDashboard.putNumber("Vision Only Pos X", lastUpdatedX);
             }
             if (lastUpdatedY != -9999) {
-              SmartDashboard.putNumber("Vision Pos Y", lastUpdatedY);
+              SmartDashboard.putNumber("Vision Only Pos Y", lastUpdatedY);
             }
-            SmartDashboard.putBoolean("Vision Pos Updated", updatedVisionPos);
+            SmartDashboard.putBoolean("Vision Only Pos Updated", updatedVisionPos);
           }
         }
       }
