@@ -579,7 +579,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
           builder.addDoubleProperty("Back Right Angle", () -> swerveBackRight.getTurningEncoderDegrees()*(Math.PI/180), null);
           builder.addDoubleProperty("Back Right Velocity", () -> swerveBackRight.getDriveEncoderVelocity(), null);
 
-        // builder.addDoubleProperty("Robot Angle", () -> , null);
+          builder.addDoubleProperty("Robot Angle", () -> getGyroRotation()*(Math.PI/180), null);
         }
       });
       // using vision to update odometry
