@@ -47,8 +47,8 @@ public class SwerveModule {
   private final TalonFX driveMotor;
 	private final TalonFXConfigurator driveMotorConfigurator;
 	private TalonFXConfiguration driveMotorConfig;
-	private VoltageOut driveVoltageControl = new VoltageOut(0.0);
-  private VelocityVoltage driveVelocityControl = new VelocityVoltage(0.0);
+	private VoltageOut driveVoltageControl = new VoltageOut(0.0).withEnableFOC(true);
+  private VelocityVoltage driveVelocityControl = new VelocityVoltage(0.0).withEnableFOC(true);
 
 	// Drive motor signals and sensors
 	private final StatusSignal<Voltage> driveMotorSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
@@ -153,9 +153,9 @@ public class SwerveModule {
 		driveMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.0;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 35.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 60.0;   // (amps) Threshold current
-    driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
+    driveMotorConfig.CurrentLimits.SupplyCurrentLimit = 60.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 35.0;   // (amps) Lower limit for the current
+    driveMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 2.0;       // (sec) Threshold time.     Was 0.1s, changed to 2.0s
     driveMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
     // configure drive encoder
@@ -182,8 +182,8 @@ public class SwerveModule {
 		turningMotorConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
 
     // Supply current limit is typically used to prevent breakers from tripping.
-    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 25.0;       // (amps) If current is above threshold value longer than threshold time, then limit current to this value
-    turningMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 40.0;   // (amps) Threshold current
+    turningMotorConfig.CurrentLimits.SupplyCurrentLimit = 40.0;       // (amps) If current is above this value for longer than threshold time, then limit current to the lower limit
+    turningMotorConfig.CurrentLimits.SupplyCurrentLowerLimit = 25.0;   // (amps) Lower limit for the current
     turningMotorConfig.CurrentLimits.SupplyCurrentLowerTime = 0.1;       // (sec) Threshold time
     turningMotorConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
 
@@ -205,8 +205,8 @@ public class SwerveModule {
 
  		// Start with factory default CANCoder configuration
     turningCanCoderConfig = new CANcoderConfiguration();			// Factory default configuration
-    turningCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
-    turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;  //TODO Determine which direction is reversed
+    turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
+    turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
 
     // Configure the swerve module motors and encoders
     configSwerveModule();
@@ -287,6 +287,17 @@ public class SwerveModule {
     return isInCoastMode;
   }
 
+  /**
+   * Sets the drive motor to FOC or trapezoidal commuatation mode
+   * <p> <b>Note</b> This takes effect for the <b>next</b> request sent to the motor.
+   * @param setFOC true = FOC mode, false = trapezoidal mode
+   */
+  public void setDriveMotorFOC(boolean setFOC) {
+    driveVelocityControl = driveVelocityControl.withEnableFOC(setFOC);
+    driveVoltageControl = driveVoltageControl.withEnableFOC(setFOC);
+  }
+
+
   // ********** Main swerve module control methods
 
   /**
@@ -327,9 +338,9 @@ public class SwerveModule {
 
   /**
    * 
-   * @param voltage voltage output to motor
+   * @param voltage voltage output to motor, nominally -12V to +12V
    */
-  public void setDriveMotorVoltageOutput(Voltage voltage){
+  public void setDriveMotorVoltageOutput(double voltage){
     driveMotor.setControl(driveVoltageControl.withOutput(voltage));
   }
   
@@ -365,17 +376,16 @@ public class SwerveModule {
 
     // Set drive motor velocity or percent output
     if(isOpenLoop){
-      setDriveMotorVoltageOutput(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond)));
-      //Note: Non deprecated current/next velocity overload of calculate requires measure<unit> type parameters and returns in voltage units.
+      setDriveMotorVoltageOutput(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond));
     }
     else {
       driveMotor.setControl(driveVelocityControl
         .withVelocity(calculateDriveEncoderVelocityRaw(desiredState.speedMetersPerSecond))
-        .withFeedForward(driveFeedforward.calculate(MetersPerSecond.mutable(getState().speedMetersPerSecond), MetersPerSecond.mutable(desiredState.speedMetersPerSecond))));
+        .withFeedForward(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)));
     }
 
     // Set turning motor target angle
-    // TODO Determine the right way to implement this code.  Make it selectable by a boolean parameter to setDesiredState?
+    // TODO Determine the right way to implement code to eliminate wheel jitter when sitting idle.  Make it selectable by a boolean parameter to setDesiredState?
     // Prevent rotating module if speed is less then 1%. Prevents Jittering.
     // double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (SwerveConstants.kMaxSpeedMetersPerSecond * 0.01)) 
     //   ? getTurningEncoderDegrees() : desiredState.angle.getDegrees(); 

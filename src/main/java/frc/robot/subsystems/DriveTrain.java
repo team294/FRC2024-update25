@@ -156,7 +156,6 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     // Set initial location to 0,0.
     poseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, Rotation2d.fromDegrees(getGyroRotation()), 
        getModulePositions(), new Pose2d(0, 0, Rotation2d.fromDegrees(0)) );
-    // poseEstimator.setVisionMeasurementStdDevs(); // TODO
     SmartDashboard.putData("Field", field);
    // SmartDashboard.putData()
   }
@@ -282,6 +281,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
 
     SmartDashboard.putString("Drive Mode", setCoast ? "Coast" : "Brake");
   }
+
   /**
    * Gets the drive train mode (coast vs brake).
    * @return Returns true if in motors are in coast, or false if in brake.
@@ -291,6 +291,18 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       swerveBackLeft.isMotorModeCoast() && swerveBackLeft.isMotorModeCoast();
   }
 
+  /**
+   * Sets the drive motors to FOC or trapezoidal commuatation mode
+   * <p> <b>Note</b> This takes effect for the <b>next</b> request sent to the motor.
+   * @param setFOC true = FOC mode, false = trapezoidal mode
+   */
+  public void setDriveMotorsFOC(boolean setFOC) {
+    swerveFrontLeft.setDriveMotorFOC(setFOC);
+    swerveFrontRight.setDriveMotorFOC(setFOC);
+    swerveBackLeft.setDriveMotorFOC(setFOC);
+    swerveBackRight.setDriveMotorFOC(setFOC);
+  }
+  
   /**
    * @param percentOutput Percent output to motor, -1 to +1
    */
@@ -346,28 +358,29 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    */
   public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
 
+    // Convert states to chassisspeeds and slew limit velocities (limit acceleration) to avoid tipping the robot.
+    ChassisSpeeds chassisSpeeds = kDriveKinematics.toChassisSpeeds(desiredStates);
+    double xSlewed, omegaLimited, ySlewed;
+    omegaLimited = chassisSpeeds.omegaRadiansPerSecond;   // No limiting for this robot -- it can't tip
+    xSlewed = chassisSpeeds.vxMetersPerSecond;            // No limiting for this robot -- it can't tip
+    ySlewed = chassisSpeeds.vyMetersPerSecond;            // No limiting for this robot -- it can't tip
+
+    // Discretize the movement to avoid unintended robot translation while robot is rotating
+    chassisSpeeds = ChassisSpeeds.discretize(xSlewed, ySlewed, omegaLimited, SwerveConstants.dt);
+
+    // convert back to swerve module states
+    desiredStates = kDriveKinematics.toSwerveModuleStates(chassisSpeeds, new Translation2d());
+    
     // Desaturate wheel speeds to a little below max speed.  It takes a while to accelerate to
     // max speed, so reducing the max will help movement accuracy.
     SwerveDriveKinematics.desaturateWheelSpeeds(
         desiredStates, SwerveConstants.kMaxSpeedMetersPerSecond);
 
-    // Convert states to chassisspeeds
-    ChassisSpeeds chassisSpeeds = kDriveKinematics.toChassisSpeeds(desiredStates);
-    double xSlewed, omegaLimited, ySlewed;
-    omegaLimited = chassisSpeeds.omegaRadiansPerSecond;
-    xSlewed = chassisSpeeds.vxMetersPerSecond;
-    ySlewed = chassisSpeeds.vyMetersPerSecond;
-
-    // convert back to swervem module states
-    desiredStates = kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(xSlewed, ySlewed, omegaLimited), new Translation2d());
-    
     swerveFrontLeft.setDesiredState(desiredStates[0], isOpenLoop);
     swerveFrontRight.setDesiredState(desiredStates[1], isOpenLoop);
     swerveBackLeft.setDesiredState(desiredStates[2], isOpenLoop);
     swerveBackRight.setDesiredState(desiredStates[3], isOpenLoop);
   }
-
-  // TODO Add version of setModuleStates with acceleration
 
   /**
    * Reads the current swerve ModuleStates.
@@ -432,8 +445,10 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    */
    public void drive(double xSpeed, double ySpeed, double rot, Translation2d centerOfRotationMeters, boolean fieldRelative, boolean isOpenLoop) {
     
-    ChassisSpeeds chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, rot);
-    if(fieldRelative) chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(getGyroRotation()));
+    ChassisSpeeds chassisSpeed;
+    chassisSpeed = fieldRelative 
+      ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, Rotation2d.fromDegrees(getGyroRotation()))
+      : new ChassisSpeeds(xSpeed, ySpeed, rot);
 
     SwerveModuleState[] swerveModuleStates =
         kDriveKinematics.toSwerveModuleStates(
@@ -479,12 +494,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
    * @return ChassisSpeeds object representing the chassis speeds.
    */
   public ChassisSpeeds getRobotSpeeds() {
-    // Calculation from chassisSpeed to robotSpeed is just the inverse of .fromFieldRelativeSpeeds.
-    // Call .fromFieldRelativeSpeeds with the negative of the robot angle to do this calculation.
-    //return ChassisSpeeds.fromFieldRelativeSpeeds(getChassisSpeeds(), Rotation2d.fromDegrees(-getGyroRotation()));
-    ChassisSpeeds chassisSpeed = getChassisSpeeds();
-    chassisSpeed.toRobotRelativeSpeeds(Rotation2d.fromDegrees(-getGyroRotation()));
-    return chassisSpeed; //More efficient / better method?
+    return ChassisSpeeds.fromRobotRelativeSpeeds(getChassisSpeeds(), Rotation2d.fromDegrees(getGyroRotation()));
   }
 
 
@@ -614,34 +624,35 @@ public class DriveTrain extends SubsystemBase implements Loggable {
   }
 
   public void updateOdometry() {
+
     poseEstimator.update(Rotation2d.fromDegrees(getGyroRotation()), getModulePositions());
 
-    if (camera.hasInit() ) {
-      Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition());
+    if (camera.hasInit()) {
+      PhotonPipelineResult latestResult = camera.getLatestResult();
+      if (latestResult != null) {
+        PhotonPipelineResult camResult = latestResult;
+        Optional<EstimatedRobotPose> result = camera.getEstimatedGlobalPose(poseEstimator.getEstimatedPosition(), camResult);
+        if (result.isPresent()) {
+          EstimatedRobotPose camPose = result.get();
+          SmartDashboard.putNumber("Vision X", camPose.estimatedPose.toPose2d().getX());
+          SmartDashboard.putNumber("Vision Y", camPose.estimatedPose.toPose2d().getY());
+          SmartDashboard.putNumber("Vision rot", camPose.estimatedPose.toPose2d().getRotation().getDegrees());
 
-      if (result.isPresent()) {
-        EstimatedRobotPose camPose = result.get();
-        SmartDashboard.putNumber("Vision X", camPose.estimatedPose.toPose2d().getX());
-        SmartDashboard.putNumber("Vision Y", camPose.estimatedPose.toPose2d().getY());
-        SmartDashboard.putNumber("Vision rot", camPose.estimatedPose.toPose2d().getRotation().getDegrees());
+          // Only run camera updates for pose estimator if useVisionForOdometry is true
+          if (camResult.hasTargets() && useVisionForOdometry) {
+            PhotonTrackedTarget bestTarget = camResult.getBestTarget();
+            if (bestTarget.getBestCameraToTarget().getX() < 3) {
+              poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
 
-        PhotonPipelineResult camResult = camera.getLatestResult();
-
-        // Only run camera updates for pose estimator if useVisionForOdometry is true
-        if (camResult.hasTargets() && useVisionForOdometry) {
-          PhotonTrackedTarget bestTarget = camResult.getBestTarget();
-          if (bestTarget.getBestCameraToTarget().getX() < 3) {
-            poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-
-            // poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, closeMatrix);
-            //field.getObject("Vision").setPose(camPose.estimatedPose.toPose2d());
-          }
-          else if (bestTarget.getBestCameraToTarget().getX() < 7) {
-              poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, farMatrix);
+              // poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, closeMatrix);
+              //field.getObject("Vision").setPose(camPose.estimatedPose.toPose2d());
+            }
+            else if (bestTarget.getBestCameraToTarget().getX() < 7) {
+                poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, farMatrix);
+            }
           }
         }
       }
-
     }
 
     // Update robot average speed
@@ -676,10 +687,22 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     return noteCamera;
   }
 
+  /**
+   * Returns the best target in this pipeline result. If there are no targets, this method will
+   * return null. The best target is determined by the target sort mode in the PhotonVision UI.
+   *
+   * @return The best target of the pipeline result.
+   */
   public PhotonTrackedTarget getBestTarget() {
     return noteCamera.getBestTarget();
   }
 
+  /**
+   * Returns the last photon pipeline result. If there are no new 
+   * pipeline results since last call, this method will return null.
+   * 
+   * @return The latest pipeline result
+   */
   public PhotonPipelineResult getLatestResult() {
     return noteCamera.getLatestResult();
   }

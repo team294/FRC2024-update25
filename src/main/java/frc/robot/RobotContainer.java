@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -18,6 +20,8 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
+
 import frc.robot.Constants.CoordType;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.OIConstants;
@@ -34,7 +38,6 @@ import frc.robot.subsystems.*;
 import frc.robot.utilities.*;
 import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
-import static edu.wpi.first.wpilibj2.command.Commands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -71,7 +74,6 @@ public class RobotContainer {
   private final Joystick coPanel = new Joystick(OIConstants.usbCoPanel);
 
   private final CommandXboxController xboxController = new CommandXboxController(OIConstants.usbXboxController);
-  private boolean lastEnabledModeAuto = true;    // True if the last mode was auto (if so, then don't go to coast mode on drivetrain).  Boot with true, so initial disabledInit does not go into Coast mode.
 
   // Set to this pattern when the robot is disabled
   
@@ -128,6 +130,8 @@ public class RobotContainer {
     SmartDashboard.putData("Wrist Nudge Angle", new WristNudgeAngle(wrist, log));
   
     // Drive base commands
+    SmartDashboard.putData("Drive FOC On", new DriveSetFOC(true, driveTrain, log));
+    SmartDashboard.putData("Drive FOC Off", new DriveSetFOC(false, driveTrain, log));
     SmartDashboard.putData("Drive Toggle Coast", new DriveToggleCoastMode(driveTrain, log));
     SmartDashboard.putData("Drive Reset Pose", new DriveResetPose(driveTrain, log));
     SmartDashboard.putData("Drive To Pose", new DriveToPose(driveTrain, log));
@@ -137,11 +141,11 @@ public class RobotContainer {
       TrajectoryConstants.maxPositionErrorMeters, TrajectoryConstants.maxThetaErrorDegrees, 
       false, false, driveTrain, log) );
 
-    SmartDashboard.putData("Drive Calibration", new DriveCalibration(0.5, 5.0, 0.1, driveTrain, log));
+    SmartDashboard.putData("Drive Calibration", new DriveCalibration(0.0, 0.5, 5.0, 0.1, driveTrain, log));
     SmartDashboard.putData("Drive Turn Calibration", new DriveTurnCalibration(0.2, 5.0, 0.2 / 5.0, driveTrain, log));
     SmartDashboard.putData("Drive Percent Speed", new DrivePercentSpeed(driveTrain, log));
 
-    // SmartDashboard.putData("Test trajectory", new DriveTrajectory(CoordType.kRelative, StopType.kCoast, trajectoryCache.cache[TrajectoryCache.TrajectoryType.test.value], driveTrain, log));
+    SmartDashboard.putData("Drive Curve Test", new DriveTrajectory(CoordType.kRelative, StopType.kBrake, trajectoryCache.cache[TrajectoryCache.TrajectoryType.test.value].blue, driveTrain, log));
     SmartDashboard.putData("Drive Straight", new DriveStraight(false, false, false, driveTrain, log));
 
     // Sequences
@@ -406,17 +410,12 @@ public class RobotContainer {
   public void disabledInit() {
     log.writeLogEcho(true, "Disabled", "Robot disabled");   // Don't log the word "Init" here -- it affects the Excel macro
 
-    // Code added Shuffleboard control to put robot in coast/brake mode.
-    // Just leave robot in brake mode when disabling so that it stops quickly if it is still moving.
-    // if (!lastEnabledModeAuto) {
-    //   driveTrain.setDriveModeCoast(true);     // When pushing a disabled robot by hand, it is a lot easier to push in Coast mode!!!!
-    // }
-
     driveTrain.stopMotors();                // SAFETY:  Turn off any closed loop control that may be running, so the robot does not move when re-enabled.
     driveTrain.enableFastLogging(false);    // Turn off fast logging, in case it was left on from auto mode
     driveTrain.setVisionForOdometryState(true);
 
     matchTimer.stop();
+    SignalLogger.stop();
   }
 
   /**
@@ -445,7 +444,6 @@ public class RobotContainer {
    */
   public void autonomousInit() {
     log.writeLogEcho(true, "Auto", "Mode Init");
-    lastEnabledModeAuto = true;
 
     driveTrain.setDriveModeCoast(false);
     driveTrain.setVisionForOdometryState(false);
@@ -466,7 +464,6 @@ public class RobotContainer {
    */
   public void teleopInit() {
     log.writeLogEcho(true, "Teleop", "Mode Init");
-    lastEnabledModeAuto = false;
 
     driveTrain.setDriveModeCoast(false);
     driveTrain.enableFastLogging(false);    // Turn off fast logging, in case it was left on from auto mode

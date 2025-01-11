@@ -8,9 +8,9 @@
         "layouts": [
           {
             "title": "Autonomous",
-            "x": 512.0,
+            "x": 384.0,
             "y": 256.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 256.0,
             "type": "List Layout",
             "properties": {
@@ -211,8 +211,8 @@
               "topic": "/SmartDashboard/problemExists",
               "period": 0.06,
               "data_type": "boolean",
-              "true_color": 4283215696,
-              "false_color": 4294198070,
+              "true_color": 4294901760,
+              "false_color": 4278190080,
               "true_icon": "None",
               "false_icon": "None"
             }
@@ -293,6 +293,7 @@
               "robot_length": 0.85,
               "show_other_objects": true,
               "show_trajectories": true,
+              "field_rotation": 0.0,
               "robot_color": 4294198070,
               "trajectory_color": 4294967295
             }
@@ -312,6 +313,30 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "photonvision_Port_1182_Output_MJPEG_Server",
+            "x": 768.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "photonvision_Port_1186_Output_MJPEG_Server",
+            "x": 1280.0,
+            "y": 128.0,
+            "width": 512.0,
+            "height": 512.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/photonvision_Port_1186_Output_MJPEG_Server",
+              "period": 0.06
             }
           }
         ]
@@ -587,6 +612,34 @@
                 }
               },
               {
+                "title": "Drive Mode",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive Mode",
+                  "period": 0.06,
+                  "data_type": "string",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Drive Speed",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive Speed",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
                 "title": "X Velocity",
                 "x": 0.0,
                 "y": 0.0,
@@ -747,6 +800,19 @@
                 "type": "Command",
                 "properties": {
                   "topic": "/SmartDashboard/Drive Turn Calibration",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": " ",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive Toggle Coast",
                   "period": 0.06,
                   "show_type": false
                 }
@@ -999,11 +1065,11 @@
             ]
           },
           {
-            "title": "Toggle Coast",
-            "x": 640.0,
-            "y": 640.0,
+            "title": "Drive Percent Speed",
+            "x": 1408.0,
+            "y": 256.0,
             "width": 256.0,
-            "height": 256.0,
+            "height": 384.0,
             "type": "List Layout",
             "properties": {
               "label_position": "LEFT"
@@ -1017,26 +1083,65 @@
                 "height": 128.0,
                 "type": "Command",
                 "properties": {
-                  "topic": "/SmartDashboard/Drive Toggle Coast",
-                  "period": 0.05,
-                  "show_type": false
+                  "topic": "/SmartDashboard/Drive Percent Speed",
+                  "period": 0.06,
+                  "show_type": true
                 }
               },
               {
-                "title": "isCoastMode",
+                "title": "angle",
                 "x": 0.0,
                 "y": 0.0,
                 "width": 128.0,
                 "height": 128.0,
-                "type": "Boolean Box",
+                "type": "Text Display",
                 "properties": {
-                  "topic": "/SmartDashboard/Drive isCoastMode",
-                  "period": 0.05,
-                  "data_type": "boolean",
-                  "true_color": 4283215696,
-                  "false_color": 4294198070,
-                  "true_icon": "None",
-                  "false_icon": "None"
+                  "topic": "/SmartDashboard/DrivePercentSpeed angle",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "percent",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/DrivePercentSpeed percent",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "maxDistance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/DrivePercentSpeed maxDistance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "curDistance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/SmartDashboard/DrivePercentSpeed curDistance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
                 }
               }
             ]

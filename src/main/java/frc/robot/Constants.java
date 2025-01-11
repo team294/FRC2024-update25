@@ -146,7 +146,7 @@ public final class Constants {
       public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 35.0;            // TODO NOT CALIBRATED - not used in code currently
       public static final double kNominalAngularAccelerationRadiansPerSecondSquared = Math.PI;
 
-      public static final double kVDriveAvg = 0.1740; // 0.1740  CALIBRATED.  0.2034 from 2023 robot.  In % output per meters per second.
+      public static final double kVDriveAvg = 0.1740 * voltageCompSaturation; // 0.1740  CALIBRATED.  0.2034 from 2023 robot.  In voltage per meters per second.
       private static final double kVmFLrel = 1.0182;      // init cal 1.0182.  CALIBRATED.  kV modifier for FL drive motor
       private static final double kVmFRrel = 0.9826;      // init cal 0.9826.  CALIBRATED.  kV modifier for FR drive motor
       private static final double kVmBLrel = 1.0102;      // init cal 1.0102.  CALIBRATED.  kV modifier for BL drive motor
@@ -158,10 +158,10 @@ public final class Constants {
       public static final double kVmBL = kVmBLrel / kVmAvg;
       public static final double kVmBR = kVmBRrel / kVmAvg;
 
-
-      public static final double kADrive = 0.0;
-      public static final double kADriveToPose = 0.100;  // Updated to 0.100 for A3, looks good.  CALIBRATED.  In % output per meters per second squared.
-      public static final double kSDrive = 0.0080; // init cal done.  formerly 0.0255, CALIBRATED.  In % output.
+      public static final double dt = 0.02;       // Timestep for discretizing robot motion, in seconds.  Set this to the scheduler time period = 20ms.
+      public static final double kADrive = 0.0 * voltageCompSaturation; // In voltage per meters per second squared.
+      public static final double kADriveToPose = 0.100;  // Updated to 0.100 for A3, looks good.  CALIBRATED.  In time (seconds).
+      public static final double kSDrive = 0.0080 * voltageCompSaturation; // init cal done.  formerly 0.0255, CALIBRATED.  In voltage.
     }
 
     public static final class DriveConstants {
