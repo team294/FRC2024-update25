@@ -28,7 +28,7 @@
                   "topic": "/SmartDashboard/Autonomous delay",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -67,7 +67,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Climb Start",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -80,7 +80,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Climb End",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -106,7 +106,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Nudge Angle Up 1 deg",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -119,16 +119,16 @@
                 "properties": {
                   "topic": "/SmartDashboard/Nudge Angle Down 1 deg",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
           },
           {
             "title": "Alliance",
-            "x": 384.0,
+            "x": 512.0,
             "y": 512.0,
-            "width": 384.0,
+            "width": 256.0,
             "height": 384.0,
             "type": "List Layout",
             "properties": {
@@ -261,7 +261,7 @@
             "properties": {
               "topic": "/SmartDashboard/Clear Sticky Faults",
               "period": 0.06,
-              "show_type": true
+              "show_type": false
             }
           },
           {
@@ -282,7 +282,7 @@
             "title": "Field",
             "x": 1280.0,
             "y": 640.0,
-            "width": 512.0,
+            "width": 384.0,
             "height": 256.0,
             "type": "Field",
             "properties": {
@@ -588,7 +588,7 @@
             "x": 640.0,
             "y": 0.0,
             "width": 256.0,
-            "height": 768.0,
+            "height": 640.0,
             "type": "List Layout",
             "properties": {
               "label_position": "LEFT"
@@ -775,7 +775,7 @@
             "height": 384.0,
             "type": "List Layout",
             "properties": {
-              "label_position": "TOP"
+              "label_position": "LEFT"
             },
             "children": [
               {
@@ -788,7 +788,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Calibration",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -801,7 +801,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Turn Calibration",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -814,14 +814,14 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Toggle Coast",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
           },
           {
             "title": "Reset Pose",
-            "x": 896.0,
+            "x": 1152.0,
             "y": 384.0,
             "width": 256.0,
             "height": 384.0,
@@ -841,7 +841,7 @@
                   "topic": "/SmartDashboard/DriveResetPose Angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -855,7 +855,7 @@
                   "topic": "/SmartDashboard/DriveResetPose X",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -869,7 +869,7 @@
                   "topic": "/SmartDashboard/DriveResetPose Y",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -882,7 +882,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Reset Pose",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -909,7 +909,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual Angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -923,7 +923,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual Target Dist",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -937,7 +937,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual MaxVel",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -951,7 +951,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual MaxAccel",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -964,14 +964,14 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Straight",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
           },
           {
             "title": "DriveToPose",
-            "x": 1152.0,
+            "x": 896.0,
             "y": 384.0,
             "width": 256.0,
             "height": 384.0,
@@ -1004,7 +1004,7 @@
                   "topic": "/SmartDashboard/DriveToPose VelMax mps",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1018,7 +1018,7 @@
                   "topic": "/SmartDashboard/DriveToPose Rot degrees",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1032,7 +1032,7 @@
                   "topic": "/SmartDashboard/DriveToPose XPos meters",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1046,7 +1046,7 @@
                   "topic": "/SmartDashboard/DriveToPose YPos meters",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1059,7 +1059,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive To Pose",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -1067,7 +1067,7 @@
           {
             "title": "Drive Percent Speed",
             "x": 1408.0,
-            "y": 256.0,
+            "y": 384.0,
             "width": 256.0,
             "height": 384.0,
             "type": "List Layout",
@@ -1085,7 +1085,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Percent Speed",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1099,7 +1099,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1113,7 +1113,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed percent",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1127,7 +1127,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed maxDistance",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1145,6 +1145,49 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Toggle Coast",
+            "x": 640.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "LEFT"
+            },
+            "children": [
+              {
+                "title": " ",
+                "x": 640.0,
+                "y": 768.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive Toggle Coast",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "isBrakeMode",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Boolean Box",
+                "properties": {
+                  "topic": "/SmartDashboard/Drive isBrakeMode",
+                  "period": 0.06,
+                  "data_type": "boolean",
+                  "true_color": 4283215696,
+                  "false_color": 4294198070,
+                  "true_icon": "None",
+                  "false_icon": "None"
+                }
+              }
+            ]
           }
         ],
         "containers": [
@@ -1152,8 +1195,8 @@
             "title": "Camera OK",
             "x": 1408.0,
             "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
+            "width": 128.0,
+            "height": 128.0,
             "type": "Boolean Box",
             "properties": {
               "topic": "/SmartDashboard/PhotonVision Connected",
@@ -1163,6 +1206,20 @@
               "false_color": 4294198070,
               "true_icon": "None",
               "false_icon": "None"
+            }
+          },
+          {
+            "title": "Swerve Drive",
+            "x": 1408.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "SwerveDrive",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve Drive",
+              "period": 0.05,
+              "show_robot_rotation": true,
+              "rotation_unit": "Radians"
             }
           }
         ]
@@ -1252,7 +1309,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Feeder Set Percent",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1279,7 +1336,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Feeder Stop",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -1305,7 +1362,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Intake Piece",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1318,7 +1375,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Shoot Piece",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1331,7 +1388,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Stop All",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -1441,7 +1498,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Shooter Set Percent",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1468,7 +1525,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Shooter Set Velocity",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1495,7 +1552,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Shooter Calibration",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1508,7 +1565,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/ShooterFeeder Stop",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -1551,7 +1608,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Intake Stop",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1648,7 +1705,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Intake Set Percent",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1689,7 +1746,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Intake Stop",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
@@ -1877,7 +1934,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Wrist Set Percent",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1904,7 +1961,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Wrist Set Angle",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1931,7 +1988,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Wrist Calibration",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1944,7 +2001,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Wrist Stop",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               }
             ]
