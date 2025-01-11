@@ -34,6 +34,7 @@ public class LED extends SubsystemBase {
   private boolean shouldClear;
   private boolean wristCalibrated;
   public enum LEDvars {
+    // create enum objects with default value of false or 0.0
     isRainbow(false),
     hasPiece(false),
     shooterVelocityWithinError(false),
@@ -41,29 +42,29 @@ public class LED extends SubsystemBase {
     wristCalibrated(false),
     shooterPercent(0.0);
     
-    private boolean bool;
-    private LEDvars(boolean b) {
+    private boolean bool; // variable to store boolean value
+    private LEDvars(boolean b) { // constructor for boolean objects
       this.bool = b;
     }
 
-    private double doub;
-    private LEDvars(double d) {
+    private double doub; // variable to store double value
+    private LEDvars(double d) { // constructor for double objects
       this.doub = d;
     }
 
-    public boolean getBooleanValue() {
+    public boolean getBooleanValue() { // getter method for booleans
       return bool;
     }
 
-    public double getDoubleValue() {
+    public double getDoubleValue() { // getter method for doubles
       return doub;
     }
 
-    public void setValue(boolean b) {
+    public void setValue(boolean b) { // setter method for booleans
       this.bool = b;
     }
 
-    public void setValue(double d) {
+    public void setValue(double d) { // setter method for doubles
       this.doub = d;
     }
   }

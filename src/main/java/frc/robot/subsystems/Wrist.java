@@ -92,7 +92,8 @@ public class Wrist extends SubsystemBase implements Loggable{
 
   private double ampAngleOffset = 0; 
 
-  private LEDvars calibrated = LEDvars.wristCalibrated;
+  private LEDvars calibrated = LEDvars.wristCalibrated; // create LEDvars object to store boolean value
+  private boolean alreadySent;
   
   public Wrist(FileLog log) {
     this.log = log;
@@ -668,11 +669,12 @@ public class Wrist extends SubsystemBase implements Loggable{
     //   updateWristLog(true);
     // }
 
-  if (wristCalibrated && !calibrated.getBooleanValue()) {
+  if (wristCalibrated && !calibrated.getBooleanValue()) { // if wrist is calibrated and wasn't previously, update value to true
     calibrated.setValue(true);
   }
-  else if (!wristCalibrated) {
+  else if (!wristCalibrated && !alreadySent) { // if wrist is uncalibrated, set value to false
     calibrated.setValue(false);
+    alreadySent = true;
   }
     
   }

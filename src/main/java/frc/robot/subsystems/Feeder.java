@@ -57,7 +57,7 @@ public class Feeder extends SubsystemBase implements Loggable{
   private double setpointRPM;
   private double setpointPercent;
 
-  private LEDvars hasPiece = LEDvars.hasPiece;
+  private LEDvars hasPiece = LEDvars.hasPiece; // create LEDvars object to store boolean value
 
   // Piece sensor inside the intake 
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);
@@ -207,10 +207,10 @@ public class Feeder extends SubsystemBase implements Loggable{
       SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
     }
 
-    if (isPiecePresent() && !hasPiece.getBooleanValue()) { // if we have a piece, update variable to true
+    if (isPiecePresent() && !hasPiece.getBooleanValue()) { // if we have a piece and didn't previously, update value to true
       hasPiece.setValue(true);
     }
-    else if (!isPiecePresent() && hasPiece.getBooleanValue()) { // if we don't, update variable to false
+    else if (!isPiecePresent() && hasPiece.getBooleanValue()) { // if we don't have a piece and did previously, update value to false
       hasPiece.setValue(false);
     }
   }

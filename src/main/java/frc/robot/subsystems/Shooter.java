@@ -71,9 +71,9 @@ public class Shooter extends SubsystemBase implements Loggable {
   private double setpointRPMTop;
   private double setpointRPMBottom;
 
-  private LEDvars shooterVelocityWithinError = LEDvars.shooterVelocityWithinError;
-  private LEDvars shooterRPMAboveZero = LEDvars.shooterRPMAboveZero;
-  private LEDvars shooterPercent = LEDvars.shooterPercent;
+  private LEDvars shooterVelocityWithinError = LEDvars.shooterVelocityWithinError; // create LEDvars object to store boolean value
+  private LEDvars shooterRPMAboveZero = LEDvars.shooterRPMAboveZero; // create LEDvars object to store boolean value
+  private LEDvars shooterPercent = LEDvars.shooterPercent; // create LEDvars object to store double value
   
   /**
    * Create the shooter subsystem
@@ -315,11 +315,11 @@ public class Shooter extends SubsystemBase implements Loggable {
       if ((isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && !shooterVelocityWithinError.getBooleanValue()) { // are we at the right velocity to shoot
         shooterVelocityWithinError.setValue(true);
       }
-      else if ((getTopShooterTargetRPM() > 0) && !shooterRPMAboveZero.getBooleanValue())  { // how close are we to the right velocity?
+      else if ((getTopShooterTargetRPM() > 0) && !shooterRPMAboveZero.getBooleanValue())  { // if our RPM is above zero, how close are we to the right velocity? 
         shooterRPMAboveZero.setValue(true);
         shooterPercent.setValue(getTopShooterVelocity() / getTopShooterTargetRPM());
       }
-      else if (shooterVelocityWithinError.getBooleanValue() || shooterRPMAboveZero.getBooleanValue()) { // not trying to shoot, don't check for anything
+      else if (shooterVelocityWithinError.getBooleanValue() || shooterRPMAboveZero.getBooleanValue()) { // either we just shot or we stopped trying to shoot, reset booleans
         shooterVelocityWithinError.setValue(false);
         shooterRPMAboveZero.setValue(false);
       }
