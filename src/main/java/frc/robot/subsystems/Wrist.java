@@ -45,7 +45,6 @@ import static frc.robot.Constants.WristConstants.*;
 public class Wrist extends SubsystemBase implements Loggable{
   private final FileLog log;
   private int logRotationKey;         // key for the logging cycle for this subsystem
-  private final LED led;
   private boolean fastLogging = false;
   private final String subsystemName;
   private final Timer bootTimer = new Timer();
@@ -95,9 +94,8 @@ public class Wrist extends SubsystemBase implements Loggable{
 
   private LEDvars calibrated = LEDvars.wristCalibrated;
   
-  public Wrist(FileLog log, LED led) {
+  public Wrist(FileLog log) {
     this.log = log;
-    this.led = led;
     logRotationKey = log.allocateLogRotation();     // Get log rotation for this subsystem
     subsystemName = "Wrist";
 

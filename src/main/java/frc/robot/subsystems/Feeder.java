@@ -31,7 +31,6 @@ import frc.robot.utilities.StringUtil;
 
 public class Feeder extends SubsystemBase implements Loggable{
   private final FileLog log;
-  private final LED led;
   private boolean fastLogging = false;
   private int logRotationKey;
   private final String subsystemName;
@@ -64,9 +63,8 @@ public class Feeder extends SubsystemBase implements Loggable{
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);
 
   /** Creates a new Feeder. */
-  public Feeder(FileLog log, LED led) {
+  public Feeder(FileLog log) {
     this.log = log;
-    this.led = led;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Feeder";
 

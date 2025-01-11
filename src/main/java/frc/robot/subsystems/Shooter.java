@@ -33,7 +33,6 @@ import frc.robot.subsystems.LED.LEDvars;
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
   private boolean fastLogging = false;
-  private final LED led;
   private int logRotationKey;
   private final String subsystemName;
 
@@ -80,9 +79,8 @@ public class Shooter extends SubsystemBase implements Loggable {
    * Create the shooter subsystem
    * @param log
    */
-  public Shooter(FileLog log, LED led) {
+  public Shooter(FileLog log) {
     this.log = log;
-    this.led = led;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Shooter";
 
