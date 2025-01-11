@@ -33,7 +33,7 @@ public class LED extends SubsystemBase {
   private Timer pieceTimer = new Timer();
   private boolean shouldClear;
   private boolean wristCalibrated;
-  public enum LEDbools {
+  public enum LEDvars {
     isRainbow(false),
     hasPiece(false),
     shooterVelocityWithinError(false),
@@ -42,12 +42,12 @@ public class LED extends SubsystemBase {
     shooterPercent(0.0);
     
     private boolean bool;
-    private LEDbools(boolean b) {
+    private LEDvars(boolean b) {
       this.bool = b;
     }
 
     private double doub;
-    private LEDbools(double d) {
+    private LEDvars(double d) {
       this.doub = d;
     }
 
@@ -308,7 +308,7 @@ public class LED extends SubsystemBase {
     // Set LEDs to match the state, as defined in Constants.BCRColor
     switch (currentState) {
     case IDLE:
-      if (LEDbools.hasPiece.getBooleanValue()) {
+      if (LEDvars.hasPiece.getBooleanValue()) {
         pieceTimer.start();
         if (pieceTimer.get() >= .5) {
           pieceTimer.stop();
@@ -318,14 +318,14 @@ public class LED extends SubsystemBase {
           pieceTimer.stop();
           pieceTimer.reset();
       }
-      if (LEDbools.hasPiece.getBooleanValue()) {
-        if (LEDbools.shooterVelocityWithinError.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
+      if (LEDvars.hasPiece.getBooleanValue()) {
+        if (LEDvars.shooterVelocityWithinError.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
           setAnimation(new Color(0, 255, 0), segment);  // rgb instead of kGreen due to error (kGreen is yellow for some reason)
-        } else if (LEDbools.shooterRPMAboveZero.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
+        } else if (LEDvars.shooterRPMAboveZero.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
           Color[] segmentPattern = new Color[segment.count];
           if (segment == LEDSegmentRange.StripLeft) {
             for (int i = 0; i < segment.count; i++) {
-              if (i >= (1.0 - LEDbools.shooterPercent.getDoubleValue()) * segment.count) {
+              if (i >= (1.0 - LEDvars.shooterPercent.getDoubleValue()) * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason 
@@ -333,7 +333,7 @@ public class LED extends SubsystemBase {
             }
           } else if (segment == LEDSegmentRange.StripRight) {
             for (int i = 0; i < segment.count; i++) {
-              if (i <= LEDbools.shooterPercent.getDoubleValue() * segment.count) {
+              if (i <= LEDvars.shooterPercent.getDoubleValue() * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
                 segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason
@@ -354,7 +354,7 @@ public class LED extends SubsystemBase {
       break;
     case SHOOTING:
       setAnimation(BCRColor.SHOOTING, segment);
-      LEDbools.hasPiece.setValue(false);
+      LEDvars.hasPiece.setValue(false);
       break;
     }
   }
@@ -364,7 +364,7 @@ public class LED extends SubsystemBase {
    */
   private void displayLEDs() {
     for (LEDSegmentRange segmentKey : segments.keySet()) {
-      if (LEDbools.isRainbow.getBooleanValue() && segmentKey == LEDSegmentRange.StripHorizontal) { continue; }
+      if (LEDvars.isRainbow.getBooleanValue() && segmentKey == LEDSegmentRange.StripHorizontal) { continue; }
       // Display this segments
       LEDSegment segment = segments.get(segmentKey);
       setPattern(segment.getCurrentFrame(), segmentKey);
@@ -446,7 +446,7 @@ public class LED extends SubsystemBase {
 
       displayLEDs();
       if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
-        LEDbools.hasPiece.setValue(false);
+        LEDvars.hasPiece.setValue(false);
       }
     }
   }
