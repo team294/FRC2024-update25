@@ -28,7 +28,7 @@
                   "topic": "/SmartDashboard/Autonomous delay",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -841,7 +841,7 @@
                   "topic": "/SmartDashboard/DriveResetPose Angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -855,7 +855,7 @@
                   "topic": "/SmartDashboard/DriveResetPose X",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -869,7 +869,7 @@
                   "topic": "/SmartDashboard/DriveResetPose Y",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -909,7 +909,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual Angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -923,7 +923,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual Target Dist",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -937,7 +937,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual MaxVel",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -951,7 +951,7 @@
                   "topic": "/SmartDashboard/DriveStraight Manual MaxAccel",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1004,7 +1004,7 @@
                   "topic": "/SmartDashboard/DriveToPose VelMax mps",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1018,7 +1018,7 @@
                   "topic": "/SmartDashboard/DriveToPose Rot degrees",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1032,7 +1032,7 @@
                   "topic": "/SmartDashboard/DriveToPose XPos meters",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1046,7 +1046,7 @@
                   "topic": "/SmartDashboard/DriveToPose YPos meters",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1085,7 +1085,7 @@
                 "properties": {
                   "topic": "/SmartDashboard/Drive Percent Speed",
                   "period": 0.06,
-                  "show_type": true
+                  "show_type": false
                 }
               },
               {
@@ -1099,7 +1099,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed angle",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1113,7 +1113,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed percent",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
@@ -1127,7 +1127,7 @@
                   "topic": "/SmartDashboard/DrivePercentSpeed maxDistance",
                   "period": 0.06,
                   "data_type": "double",
-                  "show_submit_button": false
+                  "show_submit_button": true
                 }
               },
               {
