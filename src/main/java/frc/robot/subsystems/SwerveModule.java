@@ -204,7 +204,7 @@ public class SwerveModule {
 
  		// Start with factory default CANCoder configuration
     turningCanCoderConfig = new CANcoderConfiguration();			// Factory default configuration
-    turningCanCoderConfig.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 0.5; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
+    turningCanCoderConfig.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf; //AbsoluteSensorDiscontinuityPoint replaced AbsoluteSensorRange
     turningCanCoderConfig.MagnetSensor.SensorDirection = cancoderReversed ? SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
 
     // Configure the swerve module motors and encoders
@@ -375,12 +375,12 @@ public class SwerveModule {
 
     // Set drive motor velocity or percent output
     if(isOpenLoop){
-      setDriveMotorVoltageOutput(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond));
+      setDriveMotorVoltageOutput(driveFeedforward.calculate(desiredState.speedMetersPerSecond));
     }
     else {
       driveMotor.setControl(driveVelocityControl
         .withVelocity(calculateDriveEncoderVelocityRaw(desiredState.speedMetersPerSecond))
-        .withFeedForward(driveFeedforward.calculateWithVelocities(getState().speedMetersPerSecond, desiredState.speedMetersPerSecond)));
+        .withFeedForward(driveFeedforward.calculate(desiredState.speedMetersPerSecond)));
     }
 
     // Set turning motor target angle
