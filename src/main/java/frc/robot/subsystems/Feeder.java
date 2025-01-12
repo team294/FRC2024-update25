@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
-import frc.robot.subsystems.LED.LEDvars;
+import frc.robot.subsystems.LED.LEDEvent;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
@@ -57,7 +57,7 @@ public class Feeder extends SubsystemBase implements Loggable{
   private double setpointRPM;
   private double setpointPercent;
 
-  private LEDvars hasPiece = LEDvars.hasPiece; // create LEDvars object to store boolean value
+  private LEDEvent hasPiece;
 
   // Piece sensor inside the intake 
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);

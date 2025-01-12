@@ -27,8 +27,7 @@ import frc.robot.Constants.LEDConstants.LEDSegmentRange;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
-
-import frc.robot.subsystems.LED.LEDvars;
+import frc.robot.subsystems.LED.LEDEvent;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
@@ -71,9 +70,9 @@ public class Shooter extends SubsystemBase implements Loggable {
   private double setpointRPMTop;
   private double setpointRPMBottom;
 
-  private LEDvars shooterVelocityWithinError = LEDvars.shooterVelocityWithinError; // create LEDvars object to store boolean value
-  private LEDvars shooterRPMAboveZero = LEDvars.shooterRPMAboveZero; // create LEDvars object to store boolean value
-  private LEDvars shooterPercent = LEDvars.shooterPercent; // create LEDvars object to store double value
+  private LEDEvent shooterVelocityWithinError; // create LEDvars object to store boolean value
+  private LEDEvent shooterRPMAboveZero; // create LEDvars object to store boolean value
+  private LEDEvent shooterPercent; // create LEDvars object to store double value
   
   /**
    * Create the shooter subsystem

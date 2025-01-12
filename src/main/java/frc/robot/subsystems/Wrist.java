@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.WristConstants.WristAngle;
 import frc.robot.Constants.WristConstants.WristRegion;
-import frc.robot.subsystems.LED.LEDvars;
+import frc.robot.subsystems.LED.LEDEvent;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.MathBCR;
@@ -92,7 +92,7 @@ public class Wrist extends SubsystemBase implements Loggable{
 
   private double ampAngleOffset = 0; 
 
-  private LEDvars calibrated = LEDvars.wristCalibrated; // create LEDvars object to store boolean value
+  private LEDEvent calibrated; // create LEDvars object to store boolean value
   private boolean alreadySent;
   
   public Wrist(FileLog log) {

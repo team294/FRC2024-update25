@@ -32,41 +32,14 @@ public class LED extends SubsystemBase {
   private Timer matchTimer;
   private Timer pieceTimer = new Timer();
   private boolean shouldClear;
-  private boolean wristCalibrated;
-  public enum LEDvars {
-    // create enum objects with default value of false or 0.0
-    isRainbow(false),
-    hasPiece(false),
-    shooterVelocityWithinError(false),
-    shooterRPMAboveZero(false),
-    wristCalibrated(false),
-    shooterPercent(0.0);
-    
-    private boolean bool; // variable to store boolean value
-    private LEDvars(boolean b) { // constructor for boolean objects
-      this.bool = b;
-    }
 
-    private double doub; // variable to store double value
-    private LEDvars(double d) { // constructor for double objects
-      this.doub = d;
-    }
-
-    public boolean getBooleanValue() { // getter method for booleans
-      return bool;
-    }
-
-    public double getDoubleValue() { // getter method for doubles
-      return doub;
-    }
-
-    public void setValue(boolean b) { // setter method for booleans
-      this.bool = b;
-    }
-
-    public void setValue(double d) { // setter method for doubles
-      this.doub = d;
-    }
+  public enum LEDEventOptions {
+    isRainbow,
+    isPiecePresent,
+    isShooterVelocityWithinError,
+    isShooterRPMAboveZero,
+    isWristCalibrated,
+    shooterPercent
   }
 
   // private Color[] accuracyDisplayPattern = {Color.kRed, Color.kRed};
@@ -387,7 +360,7 @@ public class LED extends SubsystemBase {
       updateStateLEDs(LEDSegmentRange.StripRight);
       updateStateLEDs(LEDSegmentRange.StripHorizontal);
 
-      // Sets CANdle red if there is a sticky fault ()
+      // Sets CANdle red if there is a sticky fault
       boolean stickyFault = false;
       if(RobotPreferences.isStickyFaultActive()) {
         setAnimation(Color.kRed, LEDSegmentRange.CANdle);
@@ -449,6 +422,27 @@ public class LED extends SubsystemBase {
       if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
         LEDvars.hasPiece.setValue(false);
       }
+    }
+  }
+  
+  public class LEDEvent {
+    private boolean bool;
+    private double doub;
+
+    public void setValue(boolean b) {
+      this.bool = b;
+    }
+
+    public void setValue (double d) {
+      this.doub = d;
+    }
+
+    public boolean getBooleanValue() {
+      return bool;
+    }
+
+    public double getDoubleValue() {
+      return doub;
     }
   }
 }
