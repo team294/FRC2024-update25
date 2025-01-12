@@ -448,13 +448,27 @@ public final class Constants {
     public enum BCRColor {
       IDLE(255, 255, 255), // White             (nothing running)
       INTAKING(0, 0, 255), // Blue       (intake running)
-      SHOOTING(0, 255, 0); // Green       (shooter running)
+      SHOOTING(0, 255, 0), // Green       (shooter running)
+      isRainbow(Color.kBlack),
+      isPiecePresent(255, 30, 0),
+      isShooterVelocityWithinError(0, 255, 0),
+      isShooterRPMAboveZero(Color.kPurple),
+      isWristCalibrated(255, 255, 0);
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {
           this.r = r;
           this.g = g;
           this.b = b;
+          this.col = Color.kBlack;
+      }
+
+      public final Color col;
+      BCRColor (Color c) {
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+        this.col = c;
       }
   }
 

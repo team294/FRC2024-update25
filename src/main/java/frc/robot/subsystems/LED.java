@@ -294,9 +294,9 @@ public class LED extends SubsystemBase {
       }
       if (LEDvars.hasPiece.getBooleanValue()) {
         if (LEDvars.shooterVelocityWithinError.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight || segment == LEDSegmentRange.StripHorizontal)) {
-          setAnimation(new Color(0, 255, 0), segment);  // rgb instead of kGreen due to error (kGreen is yellow for some reason)
+          setAnimation(BCRColor.isShooterVelocityWithinError, segment);  // rgb instead of kGreen due to error (kGreen is yellow for some reason)
         } else if (LEDvars.shooterRPMAboveZero.getBooleanValue() && (segment == LEDSegmentRange.StripLeft || segment == LEDSegmentRange.StripRight))  {
-          Color[] segmentPattern = new Color[segment.count];
+          BCRColor[] segmentPattern = new BCRColor[segment.count];
           if (segment == LEDSegmentRange.StripLeft) {
             for (int i = 0; i < segment.count; i++) {
               if (i >= (1.0 - LEDvars.shooterPercent.getDoubleValue()) * segment.count) {
@@ -310,13 +310,13 @@ public class LED extends SubsystemBase {
               if (i <= LEDvars.shooterPercent.getDoubleValue() * segment.count) {
                 segmentPattern[i] = Color.kPurple;
               } else {
-                segmentPattern[i] = new Color(255, 30, 0); // rgb values instead of kOrange due to kOrange being kYellow for some reason
+                segmentPattern[i] = BCRColor.isPiecePresent; // rgb values instead of kOrange due to kOrange being kYellow for some reason
               }
             }
           }
           setAnimation(segmentPattern, segment, true);
         } else {
-          setAnimation(new Color(255, 30, 0), segment); // rgb values instead of kOrange due to kOrange being kYellow for some reason
+          setAnimation(BCRColor.isPiecePresent, segment); // rgb values instead of kOrange due to kOrange being kYellow for some reason
         }
       }
       else {

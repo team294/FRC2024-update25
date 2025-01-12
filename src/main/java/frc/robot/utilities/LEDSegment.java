@@ -2,6 +2,7 @@ package frc.robot.utilities;
 
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
+import frc.robot.Constants.BCRColor;
 
 /** LED segment defines a range of LEDs and its current animation */
 public class LEDSegment {
