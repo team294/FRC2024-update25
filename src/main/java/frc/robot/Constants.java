@@ -478,6 +478,30 @@ public final class Constants {
           public static final Color[] clearPatternStatic = {Color.kBlack};
       }
 
+      public static final class ChoreoConstants {
+        // Robot dimensions needed for choreo
+       
+        //ROBOT DIMENSIONS, when adding a value include units ----------------------------------------------
+          public static final double mass = 0; // Placeholder
+          public static final double moi = 0; // Robot moment of inertia around center vertical access -- Placeholder
+          public static final double bmFront = 0; // Distance from robot center to front bumper edge -- Placeholder
+          public static final double bmBack = 0; // Distance from robot center to back bumper edge -- Placeholder
+          public static final double bmSide = 0; // Distance from robot center to side bumper edge -- Placeholder
+        
+        //WHEEL AND MOTOR INFO, when adding a value include units where applicable -------------------------
+        public static final double wheelRadius = 0; // Radius of swerve wheels -- Placeholder
+        public static final double wheelCOF = 0; // Coefficient of friction between wheel and ground -- Placeholder
+        public static final double mwRev = 0; // Gearing between motor shaft and wheel axle -- Placeholder
+        public static final double mMaxSpeed = 0; // Actual motor speed at 12V, in RPM -- Placeholder
+        public static final double mMaxTorque = 0; // Motor torque as current limited -- Placeholder
+
+        //DRIVE TYPE, when adding a value include units, drive type is swerve ---------------------------------------
+        public static final double fModX = 0; // x coordinate of both front modules -- Placeholder
+        public static final double fLeftY = 0; // y coordinate of front left module -- Placeholder
+        public static final double bModX = 0; // x coordinate of back modules (negative value) -- Placeholder
+        public static final double bModY = 0; // y coordinate of back left module -- Placeholder
+      }
+
       public enum LEDSegmentRange {
           CANdle(0,8), // Whole CANdle
           StripLeft(32, 29),  // Left strip only -- D5:  Updated for 2 less LEDs
