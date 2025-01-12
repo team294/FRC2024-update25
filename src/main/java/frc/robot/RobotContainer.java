@@ -61,7 +61,6 @@ public class RobotContainer {
   private final TrajectoryCache trajectoryCache = new TrajectoryCache(log);
   private final AutoSelection autoSelection = new AutoSelection(trajectoryCache, allianceSelection, log);
   private final BCRRobotState robotState = new BCRRobotState();
-  private final AutoFactory autoFactory; 
   
   // Is a subsystem, but requires a utility
   private final LED led = new LED(Constants.Ports.CANdle1, "LED", shooter, feeder, robotState, matchTimer, wrist, log);
@@ -81,13 +80,6 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
     configureShuffleboard();
-    autoFactory = new AutoFactory(
-      driveTrain::getPose,
-      driveTrain::resetPose,
-      driveTrain.choreoFollowTrajectory(),
-      false, 
-      driveTrain);
-    autoFactory.cache().loadTrajectory("TestPath");
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
     driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
 
@@ -381,7 +373,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoSelection.getAutoCommand(intake, wrist, shooter, feeder, driveTrain, robotState, autoFactory, log);
+    return autoSelection.getAutoCommand(intake, wrist, shooter, feeder, driveTrain, robotState, log);
   }
 
 

@@ -40,16 +40,16 @@ public class ChoreoFollower extends Command {
    * This method takes in a choreo trajectory and follows the contents of that trajectory until the
    * the trajectory is finished 
    * 
-   * @param trajectory Choreo trajectory to follow
-   * @param xController Trajectory PID X feedback controller
-   * @param yController  Trajectory PID Y feedback controller 
-   * @param rotationController Roation PID feedback controller
+   * @param trajectory     Choreo trajectory to follow
+   * @param xController    Trajectory PID X feedback controller
+   * @param yController    Trajectory PID Y feedback controller 
+   * @param rotationController  Roation PID feedback controller
    * @param outputChassisSpeeds a function that takes in a chassis speeds and controls the robot
-   * @param poseSupplier a pose supplier to get the current robot position
-   * @param mirrorTrajectory  determines if the trajectory will be mirrored: when true the trajectory will mirror while internal robot odometry will remain the same.
+   * @param poseSupplier        a pose supplier to get the current robot position
+   * @param mirrorTrajectory    determines if the trajectory will be mirrored: when true the trajectory will mirror while internal robot odometry will remain the same.
    *                            When false the trajectory will not be changed
-   * @param driveTrain  Drive Train subsystem
-   * @param log LogFile for logging
+   * @param driveTrain          Drive Train subsystem
+   * @param log                 LogFile for logging
    */
   public ChoreoFollower(Trajectory<SwerveSample> trajectory, PIDController xController, PIDController yController, PIDController rotationController, Consumer<ChassisSpeeds> outputChassisSpeeds, Supplier<Pose2d> poseSupplier, BooleanSupplier mirrorTrajectory, DriveTrain driveTrain, FileLog log) {
     this.trajectory = trajectory;
@@ -102,7 +102,7 @@ public class ChoreoFollower extends Command {
           "Robot Y", poseSupplier.get().getTranslation().getY(),
           "Robot Vel", Math.hypot(driveTrain.getRobotSpeeds().vxMetersPerSecond, driveTrain.getRobotSpeeds().vyMetersPerSecond),
           "Robot VelAng", Math.toDegrees(Math.atan2(driveTrain.getRobotSpeeds().vyMetersPerSecond, driveTrain.getRobotSpeeds().vxMetersPerSecond)),
-          "Robot rot", driveTrain.getPose().getRotation().getDegrees());
+          "Robot rot", poseSupplier.get().getRotation().getDegrees());
         
     } 
     else{

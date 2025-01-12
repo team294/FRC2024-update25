@@ -60,8 +60,7 @@ public class AutoSelection {
 	public static final int SourceFifthNoteAndShoot = 18;
 	public static final int SourceWallMobilityAuto = 19;
 	public static final int AmpThreePieceCenter = 20;
-	public static final int ChoreoTrajectory = 21;
-	public static final int ChoreoTrajectoryWithFollower = 22;
+	public static final int ChoreoTrajectoryWithFollower = 21;
 
 	private final AllianceSelection allianceSelection;
 	private final TrajectoryCache trajectoryCache;
@@ -96,7 +95,6 @@ public class AutoSelection {
 		autoChooser.addOption("SourceFifthNoteAndShoot", SourceFifthNoteAndShoot);
 		autoChooser.addOption("SourceMobilityIntoSide", SourceWallMobilityAuto);
 		autoChooser.addOption("AmpThreePieceCenter", AmpThreePieceCenter);
-		autoChooser.addOption("ChoreoTrajectory", ChoreoTrajectory);
 		autoChooser.addOption("ChoreoTrajectoryWithFollower", ChoreoTrajectoryWithFollower);
 
 
@@ -120,7 +118,7 @@ public class AutoSelection {
 	 * @return the command to run
 	 */
 
-	public Command getAutoCommand(Intake intake, Wrist wrist, Shooter shooter, Feeder feeder, DriveTrain driveTrain, BCRRobotState robotState, AutoFactory autoFactory, FileLog log) {
+	public Command getAutoCommand(Intake intake, Wrist wrist, Shooter shooter, Feeder feeder, DriveTrain driveTrain, BCRRobotState robotState, FileLog log) {
 		Command autonomousCommandMain = null;
 
 		
@@ -236,13 +234,6 @@ public class AutoSelection {
 		else if (autoPlan == AmpThreePieceCenter) {
 			log.writeLogEcho(true, "AutoSelect", "run Amp Three Piece");
 			autonomousCommandMain = new AmpThreePieceCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
-		}
-
-		else if (autoPlan == ChoreoTrajectory){
-			log.writeLogEcho(true, "AutoSelect", "run Choreo Trajectory");
-			autonomousCommandMain = new SequentialCommandGroup(
-				autoFactory.resetOdometry("TestPath"),
-				autoFactory.trajectoryCmd("TestPath"));
 		}
 
 		else if (autoPlan == ChoreoTrajectoryWithFollower){
