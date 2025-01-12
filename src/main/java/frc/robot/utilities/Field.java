@@ -8,6 +8,7 @@ import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
@@ -26,6 +27,9 @@ public class Field {
     private final Rotation2d twoForty = new Rotation2d(Math.PI*(4/3));
     private final Rotation2d sixty = new Rotation2d(Math.PI/3);
     private final Rotation2d threeHundred = new Rotation2d(Math.PI*(5/3));
+    private final Rotation2d oneTwentySix = new Rotation2d(Units.degreesToRadians(126));
+    private final Rotation2d twoThirtyFour = new Rotation2d(Units.degreesToRadians(234));
+
 
     // BLUE  
     //IDs 1 and 2 are loading zone
@@ -39,23 +43,8 @@ public class Field {
     //IDs 12 and 13 are speaker
     //IDs 14 - 16 are stage
     private final AprilTag[] AprilTags = {
-        new AprilTag(1, new Pose3d(new Pose2d(15.0794638570895, 0.245871867229192, oneTwenty))),      // 120 degrees
-        new AprilTag(2, new Pose3d(new Pose2d(16.1851252600324, 0.883665522820618, oneTwenty))),      // 120 degrees
-        new AprilTag(3, new Pose3d(new Pose2d(1.84149900559054, 8.20419556973439, twoSeventy))),      // 270 degrees
-        new AprilTag(4, new Pose3d(new Pose2d(-0.0380999794260111, 5.5478650041529, zero))),            // 0 degrees
-        new AprilTag(5, new Pose3d(new Pose2d(-0.0380999794260111, 4.98271530933373, zero))),           // 0 degrees
-        new AprilTag(6, new Pose3d(new Pose2d(5.32078912677387, 4.10514578322128, zero))),            // 0 degrees
-        new AprilTag(7, new Pose3d(new Pose2d(4.64133949367667, 4.49833757089771, oneTwenty))),       // 120 degrees
-        new AprilTag(8, new Pose3d(new Pose2d(4.64133949367667, 3.71322399485904, twoForty))),        // 240 degrees
-        new AprilTag(9, new Pose3d(new Pose2d(0.356107807701784, 0.883665522820618, sixty))),         // 60 degrees
-        new AprilTag(10, new Pose3d(new Pose2d(1.46151521078179, 0.245871867229192, sixty))),         // 60 degrees
-        new AprilTag(11, new Pose3d(new Pose2d(14.700750061595, 8.20419556973439, twoSeventy))),      // 270 degrees
-        new AprilTag(12, new Pose3d(new Pose2d(16.5793330471602, 4.98271530933373, oneEighty))),      // 180 degrees
-        new AprilTag(13, new Pose3d(new Pose2d(16.5793330471602, 5.5478650041529, oneEighty))),       // 180 degrees
-        new AprilTag(14, new Pose3d(new Pose2d(11.9047195714514, 3.71322399485904, threeHundred))),   // 300 degrees
-        new AprilTag(15, new Pose3d(new Pose2d(11.9047195714514, 4.49833757089771, sixty))),          // 60 degrees
-        new AprilTag(16, new Pose3d(new Pose2d(11.2201899410974, 4.10514578322128, oneEighty)))       // 180 degrees
-    };
+        new AprilTag(1, new Pose3d(new Pose2d(Units.inchesToMeters(657.37), Units.inchesToMeters(25.80), oneTwentySix))),      // 120 degrees
+        };
 
     private final AllianceSelection alliance;
     private final FileLog log;

@@ -656,8 +656,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
   }  
 
   /** Uses solely vision to periodically provide 
-   * an estimate of the position of the robot,
-   * parallels updateOdometry, but does not use odometry
+   * an estimate of the position of the robot.
    */
   public void updateVision() {
     if (camera.hasInit()) {
@@ -675,19 +674,9 @@ public class DriveTrain extends SubsystemBase implements Loggable {
               PhotonTrackedTarget bestTarget = latestResult.getBestTarget();
               if (bestTarget != null) {
                 // Add X and Y measurments if the best target is less than 3 meters away
-                if (bestTarget.getBestCameraToTarget().getX() < 3) {
-                  poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
-                  lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
-                  lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
-                  updatedVisionPos = true;
-                }
-                // Add X and Y measurments with the matrix to reduce the usage of measurements if the target is between 3 and 7 meters away
-                else if (bestTarget.getBestCameraToTarget().getX() < 7) {
-                  poseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds, farMatrix);
-                  lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
-                  lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
-                  updatedVisionPos = true;
-                }
+                lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
+                lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
+                updatedVisionPos = true;
               }
             }
             
