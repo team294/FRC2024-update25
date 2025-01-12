@@ -378,7 +378,7 @@ public class LED extends SubsystemBase {
 
       // Sets CANdle yellow until wrist is calibrated
       if (wristCalibrated) {
-        setAnimation(Color.kYellow, LEDSegmentRange.CANdle);
+        setAnimation(BCRColor.isWristCalibrated, LEDSegmentRange.CANdle);
       }
       // Removes yellow when wrist is calibrated
       else if (wristCalibrated && !stickyFault) {
