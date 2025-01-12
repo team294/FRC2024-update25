@@ -64,6 +64,17 @@ public class LEDSegment {
         setAnimation(anim, true);
     }
 
+    /**
+     * Set/reset the color of the segment
+     * @param r red value (max 255)
+     * @param g green value (max 255)
+     * @param b blue value (max 255)
+     */
+    public void setAnimation(int r, int g, int b) {
+        Color color = new Color(r, g, b);
+        setAnimation(color);
+    }
+
     public Color[] getCurrentFrame() {
         if (isFinished()) return Constants.LEDConstants.Patterns.noPatternStatic;
         else return animation[frame];
