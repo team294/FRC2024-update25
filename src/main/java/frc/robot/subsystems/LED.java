@@ -196,7 +196,7 @@ public class LED extends SubsystemBase {
     previousEventCANdle = event;
   }
 
-  public void updateState(StripEvents event) {
+  public void updateState(StripEvents event) { // TODO make idle lowest priority but override shoot and piece
     // Store the state
     currentState = robotState.getState();
 
@@ -230,7 +230,7 @@ public class LED extends SubsystemBase {
       case piecePresent:
         updateLEDs(BCRColor.piecePresent, true);
         break;
-      default: // idle
+      default: // idle TODO make work
         switch (currentState) {
           case SHOOTING:
             updateLEDs(BCRColor.SHOOTING, true);
