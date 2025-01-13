@@ -19,21 +19,20 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
-import frc.robot.Constants.LEDConstants.LEDSegmentRange;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
-import frc.robot.subsystems.LED.LEDEvent;
+import frc.robot.subsystems.LED.StripEvents;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
   private boolean fastLogging = false;
   private int logRotationKey;
   private final String subsystemName;
+  private final LED led;
 
   // Create Kraken for top shooter motor
   private final TalonFX shooterTop = new TalonFX(Ports.CANShooterTop);
@@ -69,19 +68,17 @@ public class Shooter extends SubsystemBase implements Loggable {
   private boolean velocityControlOn = false;
   private double setpointRPMTop;
   private double setpointRPMBottom;
+  private boolean lastShooterVelocityWithinErrorReading;
 
-  private LEDEvent shooterVelocityWithinError; // create LEDvars object to store boolean value
-  private LEDEvent shooterRPMAboveZero; // create LEDvars object to store boolean value
-  private LEDEvent shooterPercent; // create LEDvars object to store double value
-  
   /**
    * Create the shooter subsystem
    * @param log
    */
-  public Shooter(FileLog log) {
+  public Shooter(FileLog log, LED led) {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Shooter";
+    this.led = led;
 
     // Configure top shooter motor
     shooterTopConfigurator = shooterTop.getConfigurator();
@@ -311,16 +308,13 @@ public class Shooter extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
       
-      if ((isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && !shooterVelocityWithinError.getBooleanValue()) { // are we at the right velocity to shoot
-        shooterVelocityWithinError.setValue(true);
+      if ((isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && !lastShooterVelocityWithinErrorReading) { // are we at the right velocity to shoot
+        led.updateState(StripEvents.shooterWithinTargetVelocity);
+        lastShooterVelocityWithinErrorReading = true;
       }
-      else if ((getTopShooterTargetRPM() > 0) && !shooterRPMAboveZero.getBooleanValue())  { // if our RPM is above zero, how close are we to the right velocity? 
-        shooterRPMAboveZero.setValue(true);
-        shooterPercent.setValue(getTopShooterVelocity() / getTopShooterTargetRPM());
-      }
-      else if (shooterVelocityWithinError.getBooleanValue() || shooterRPMAboveZero.getBooleanValue()) { // either we just shot or we stopped trying to shoot, reset booleans
-        shooterVelocityWithinError.setValue(false);
-        shooterRPMAboveZero.setValue(false);
+
+      if (!(isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && lastShooterVelocityWithinErrorReading) {
+        led.updateState(StripEvents.idle);
       }
    }
   }

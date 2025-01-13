@@ -450,10 +450,12 @@ public final class Constants {
       INTAKING(0, 0, 255), // Blue       (intake running)
       SHOOTING(0, 255, 0), // Green       (shooter running)
       isRainbow(Color.kBlack),
-      isPiecePresent(255, 30, 0),
-      isShooterVelocityWithinError(0, 255, 0),
-      isShooterRPMAboveZero(Color.kPurple),
-      isWristCalibrated(255, 255, 0);
+      shooterWithinTargetVelocity(0, 255, 0),
+      shooterRPMAboveZero(Color.kPurple),
+      piecePresent(255, 30, 0),
+      wristUncalibrated(255, 255, 0), // CANdle only
+      stickyFaultPresent(255, 0, 0), // CANdle only
+      CANdleDefault(0, 0, 0);
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {

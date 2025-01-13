@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.Ports;
 import frc.robot.Constants.WristConstants.WristAngle;
 import frc.robot.Constants.WristConstants.WristRegion;
-import frc.robot.subsystems.LED.LEDEvent;
+import frc.robot.subsystems.LED.CANdleEvents;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.MathBCR;
@@ -48,6 +48,7 @@ public class Wrist extends SubsystemBase implements Loggable{
   private boolean fastLogging = false;
   private final String subsystemName;
   private final Timer bootTimer = new Timer();
+  private final LED led;
   
   private final TalonFX wristMotor1 = new TalonFX(Ports.CANWrist1);
   private final TalonFX wristMotor2 = new TalonFX(Ports.CANWrist2);
@@ -91,14 +92,14 @@ public class Wrist extends SubsystemBase implements Loggable{
   private double safeAngle;         // current wrist target on position control on the Falcon motor (if the Falcon is in position mode)
 
   private double ampAngleOffset = 0; 
-
-  private LEDEvent calibrated; // create LEDvars object to store boolean value
-  private boolean alreadySent;
   
-  public Wrist(FileLog log) {
+  public Wrist(FileLog log, LED led) {
     this.log = log;
     logRotationKey = log.allocateLogRotation();     // Get log rotation for this subsystem
     subsystemName = "Wrist";
+    this.led = led;
+
+    led.updateState(CANdleEvents.wristUncalibrated); // wrist is initially uncalibrated
 
 		// Start with factory default TalonFX configuration
 		wristMotor1Config = new TalonFXConfiguration();			// Factory default configuration
@@ -445,6 +446,7 @@ public class Wrist extends SubsystemBase implements Loggable{
 			"Wrist Angle", getWristAngle(), "Wrist Target", getCurrentWristTarget());
 
     wristCalibrated = false;
+    led.updateState(CANdleEvents.wristUncalibrated); // wrist in uncalibrated
   }
 
   /**
@@ -458,6 +460,8 @@ public class Wrist extends SubsystemBase implements Loggable{
     wristCalZero = getWristEncoderRotationsRaw()* kWristDegreesPerRotation - angle;
     wristCalZero2 = getWristEncoder2RotationsRaw()* kWristDegreesPerRotation - angle;
 		wristCalibrated = true;
+
+    led.updateState(CANdleEvents.wristCalibrated); // wrist is calibrated
 
     log.writeLog(true, "Wrist", "Calibrate wrist", "zero value", wristCalZero, 
 			"Rev angle", getRevEncoderDegrees(), "Enc Raw", getWristEncoderRotationsRaw(),
@@ -639,6 +643,7 @@ public class Wrist extends SubsystemBase implements Loggable{
       calibrationStickyFaultReported = true;
       RobotPreferences.recordStickyFaults("Wrist-Not-calibrated-when-enabled", log);
       log.writeLogEcho(true, subsystemName, "calibrate Wrist", "Wrist calibrated", false);
+      led.updateState(CANdleEvents.wristUncalibrated);
     }
 
     // If the driver station is disabled, then turn off any position control for the wrist motor
@@ -668,15 +673,6 @@ public class Wrist extends SubsystemBase implements Loggable{
     //   setWristUncalibrated();
     //   updateWristLog(true);
     // }
-
-  if (wristCalibrated && !calibrated.getBooleanValue()) { // if wrist is calibrated and wasn't previously, update value to true
-    calibrated.setValue(true);
-  }
-  else if (!wristCalibrated && !alreadySent) { // if wrist is uncalibrated, set value to false
-    calibrated.setValue(false);
-    alreadySent = true;
-  }
-    
   }
  
 }

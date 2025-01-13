@@ -4,7 +4,6 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.CANifier.LEDChannel;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -24,7 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
-import frc.robot.subsystems.LED.LEDEvent;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
@@ -34,6 +33,7 @@ public class Feeder extends SubsystemBase implements Loggable{
   private boolean fastLogging = false;
   private int logRotationKey;
   private final String subsystemName;
+  private final LED led;
 
   // Create Kraken for feeder motor
   private final TalonFX feeder = new TalonFX(Ports.CANFeeder);
@@ -56,17 +56,17 @@ public class Feeder extends SubsystemBase implements Loggable{
   private boolean velocityControlOn = false;
   private double setpointRPM;
   private double setpointPercent;
-
-  private LEDEvent hasPiece;
+  private boolean lastPiecePresentReading; // true = piece was present in feeder
 
   // Piece sensor inside the intake 
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);
 
   /** Creates a new Feeder. */
-  public Feeder(FileLog log) {
+  public Feeder(FileLog log, LED led) {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Feeder";
+    this.led = led;
 
     // Configure feeder
     feederConfigurator = feeder.getConfigurator();
@@ -98,6 +98,9 @@ public class Feeder extends SubsystemBase implements Loggable{
 
     // Stop Feeder Motor
     stopFeeder();
+
+    lastPiecePresentReading = false;
+    led.updateState(StripEvents.idle);
   }
 
   /**
@@ -187,7 +190,6 @@ public class Feeder extends SubsystemBase implements Loggable{
   // ***  Piece sensor
 
   /**
-   * 
    * @return true if piece is in feeder
    */
   public boolean isPiecePresent(){
@@ -205,13 +207,17 @@ public class Feeder extends SubsystemBase implements Loggable{
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " RPM"), getFeederVelocity());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Temp C"), feederTemp.refresh().getValueAsDouble());
       SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
-    }
 
-    if (isPiecePresent() && !hasPiece.getBooleanValue()) { // if we have a piece and didn't previously, update value to true
-      hasPiece.setValue(true);
-    }
-    else if (!isPiecePresent() && hasPiece.getBooleanValue()) { // if we don't have a piece and did previously, update value to false
-      hasPiece.setValue(false);
+      // if we have a piece and previously didn't have a piece, update state
+      if (isPiecePresent() && !lastPiecePresentReading) {
+        led.updateState(StripEvents.piecePresent);
+        lastPiecePresentReading = true;
+      }
+      // if we don't have a piece and previously did have a piece, update state
+      else if (!isPiecePresent() && lastPiecePresentReading) {
+          led.updateState(StripEvents.idle);
+          lastPiecePresentReading = false;
+      }
     }
   }
 
