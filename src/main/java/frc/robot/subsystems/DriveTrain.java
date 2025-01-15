@@ -22,6 +22,8 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -155,10 +157,11 @@ public class DriveTrain extends SubsystemBase implements Loggable {
     poseEstimator = new SwerveDrivePoseEstimator(kDriveKinematics, Rotation2d.fromDegrees(getGyroRotation()), 
        getModulePositions(), new Pose2d(0, 0, Rotation2d.fromDegrees(0)) );
     SmartDashboard.putData("Field", field);
+   // SmartDashboard.putData()
   }
   
 
-  // ************ Gryo methods
+  // ************ Gyro methods
 
   /**
    * Verifies if Gyro is still reading
@@ -278,6 +281,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
 
     SmartDashboard.putString("Drive Mode", setCoast ? "Coast" : "Brake");
   }
+
   /**
    * Gets the drive train mode (coast vs brake).
    * @return Returns true if in motors are in coast, or false if in brake.
@@ -287,6 +291,18 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       swerveBackLeft.isMotorModeCoast() && swerveBackLeft.isMotorModeCoast();
   }
 
+  /**
+   * Sets the drive motors to FOC or trapezoidal commuatation mode
+   * <p> <b>Note</b> This takes effect for the <b>next</b> request sent to the motor.
+   * @param setFOC true = FOC mode, false = trapezoidal mode
+   */
+  public void setDriveMotorsFOC(boolean setFOC) {
+    swerveFrontLeft.setDriveMotorFOC(setFOC);
+    swerveFrontRight.setDriveMotorFOC(setFOC);
+    swerveBackLeft.setDriveMotorFOC(setFOC);
+    swerveBackRight.setDriveMotorFOC(setFOC);
+  }
+  
   /**
    * @param percentOutput Percent output to motor, -1 to +1
    */
@@ -534,6 +550,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber("Drive X Velocity", robotSpeeds.vxMetersPerSecond);
       SmartDashboard.putNumber("Drive Y Velocity", robotSpeeds.vyMetersPerSecond);
       SmartDashboard.putBoolean("Drive isGyroReading", isGyroReading());
+      SmartDashboard.putBoolean("Drive isBrakeMode", !isDriveModeCoast());
       SmartDashboard.putNumber("Drive Raw Gyro", getGyroRaw());
       SmartDashboard.putNumber("Drive Gyro Rotation", getGyroRotation());
       SmartDashboard.putNumber("Drive AngVel", getAngularVelocity());
@@ -545,6 +562,26 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber("Drive Odometry Y", pose.getTranslation().getY());
       SmartDashboard.putNumber("Drive Odometry Theta", pose.getRotation().getDegrees());
 
+      SmartDashboard.putData("Swerve Drive", new Sendable() {
+        @Override
+        public void initSendable(SendableBuilder builder) {
+          builder.setSmartDashboardType("SwerveDrive");
+
+          builder.addDoubleProperty("Front Left Angle", () -> swerveFrontLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
+          builder.addDoubleProperty("Front Left Velocity", () -> swerveFrontLeft.getDriveEncoderVelocity(), null);
+
+          builder.addDoubleProperty("Front Right Angle", () -> swerveFrontRight.getTurningEncoderDegrees()*(Math.PI/180), null);
+          builder.addDoubleProperty("Front Right Velocity", () -> swerveFrontRight.getDriveEncoderVelocity(), null);
+
+          builder.addDoubleProperty("Back Left Angle", () -> swerveBackLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
+          builder.addDoubleProperty("Back Left Velocity", () -> swerveBackLeft.getDriveEncoderVelocity(), null);
+
+          builder.addDoubleProperty("Back Right Angle", () -> swerveBackRight.getTurningEncoderDegrees()*(Math.PI/180), null);
+          builder.addDoubleProperty("Back Right Velocity", () -> swerveBackRight.getDriveEncoderVelocity(), null);
+
+          builder.addDoubleProperty("Robot Angle", () -> getGyroRotation()*(Math.PI/180), null);
+        }
+      });
       // using vision to update odometry
       SmartDashboard.putBoolean("Vision Updating Odometry", useVisionForOdometry);
 
