@@ -453,7 +453,7 @@ public final class Constants {
       PIECE_PRESENT(255, 30, 0),
       WRIST_UNCALIBRATED(255, 255, 0),  // CANdle only
       STICKY_FAULT_PRESENT(255, 0, 0),  // CANdle only
-      CANdleDefault(0, 0, 0);           // CANdle only
+      CANDLE_DEFAULT(0, 0, 0);          // CANdle only
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {

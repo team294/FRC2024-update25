@@ -34,7 +34,7 @@ public class LED extends SubsystemBase {
   private CANdleEvents previousEventCANdle;
   private StripEvents previousEventStrip;
   private boolean lastIsDisabledReading = false;
-  private boolean lastStickyFaultReading = false;
+  private boolean lastStickyFaultPresentReading = false;
 
   public enum CANdleEvents {
     STICKY_FAULTS_CLEARED,
@@ -127,6 +127,10 @@ public class LED extends SubsystemBase {
     }
   }
 
+  /**
+   * Update strips in the last 10 seconds of the match
+   * @param percent percent of the way through the last 10 seconds
+   */
   public void updateLastTenSecondsLEDs(double percent) {
     // Generates segment pattern for the left vertical segment based on percent
     Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
@@ -167,7 +171,7 @@ public class LED extends SubsystemBase {
   /**
    * Change the color of the LEDs based on parameters
    * @param color BCRColor to use (see enum in constants)
-   * @param strip
+   * @param strip true = update strips, false = update CANdle
    */
   public void updateLEDs(BCRColor color, boolean strip) {
     if (strip) {
@@ -180,6 +184,10 @@ public class LED extends SubsystemBase {
     }
   }
 
+  /**
+   * Update the CANdle based on the state
+   * @param event CANdle event to use
+   */
   public void updateState(CANdleEvents event) {
     // if new event priority is less than previous, do not update
     if (getPriority(event) < getPriority(previousEventCANdle)) return;
@@ -192,18 +200,24 @@ public class LED extends SubsystemBase {
         updateLEDs(BCRColor.STICKY_FAULT_PRESENT, false);
         break;
       default:
-        updateLEDs(BCRColor.CANdleDefault, false);
+        updateLEDs(BCRColor.CANDLE_DEFAULT, false);
         break;
     }
 
+    // Update previous event for CANdle to event that just happened
     previousEventCANdle = event;
   }
 
+  /**
+   * Update the LED Strips based on the state
+   * @param event Strip event to use
+   */
   public void updateState(StripEvents event) {
     // Store the state
     currentState = robotState.getState();
 
-    // only update if last event was idle and new priority is greater than previous
+    // Do not update state if last event was not idle and the new priority is 
+    // less than the previous. Always update state if previous event was idle.
     if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
     switch (event) {
@@ -235,27 +249,16 @@ public class LED extends SubsystemBase {
         break;
     }
 
+    // Update previous event for strips to event that just happened
     previousEventStrip = event;
   }
 
-  /** Get the subsystem's name
+  /** 
+   * Get the subsystem's name
    * @return the name of the subsystem
    */
   public String getName() {
     return subsystemName;
-  }
-  
-  /** Clear all LEDs */
-  public void clearLEDs() {
-    setLEDs(0, 0, 0);
-  }
-
-  /**
-   * Clear the LEDs of a specific segment range
-   * @param segment the segment to clear
-   */
-  public void clearLEDs(LEDSegmentRange segment) {
-    setLEDs(0, 0, 0, segment);
   }
   
   /**
@@ -270,20 +273,10 @@ public class LED extends SubsystemBase {
   
   /**
    * Start a built-in animation
-   * @param anim
+   * @param anim animation object to use
    */
   public void animate(Animation anim) {
     candle.animate(anim);
-  }
-
-  /**
-   * Sets the pattern and resizes it to fit the LED strip
-   * @param color the color to use
-   * @param segment the segment to use
-   */
-  public void setColor(Color color, LEDSegmentRange segment) {
-    Color[] pattern = {color};
-    setPattern(pattern, segment);
   }
 
   /**
@@ -321,25 +314,6 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Sets the animation for a given led segment
-   * @param color color to display
-   * @param segment segment to play animation on
-   */
-  public void setAnimation(Color color, LEDSegmentRange segment) {
-    segments.get(segment).setAnimation(color);
-  }
-  
-  /**
-   * Sets the animation for a given led segment using BCRColor
-   * @param color BCRColor to display
-   * @param segment segment to play animation on
-   */
-  public void setAnimation(BCRColor color, LEDSegmentRange segment) {
-    Color _color = new Color(color.r, color.g, color.b);
-    segments.get(segment).setAnimation(_color);
-  }
-
-  /**
    * Sets LEDs using only R, G, and B
    * @param r red value
    * @param g green value
@@ -350,25 +324,6 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Takes in color and sets correct RGB values
-   * @param color color to set
-   */
-  public void setLEDs(Color color) {
-    setLEDs((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255));
-  }
-
-  /**
-   * Sets LEDs using RGB, index, and count values
-   * @param r red value
-   * @param g green value
-   * @param b blue value
-   * @param index index to start at
-   * @param count number of LEDs
-   */
-  public void setLEDs(int r, int g, int b, int index, int count) {
-    candle.setLEDs(r, g, b, 0, index, count);
-  }
-  /**
    * Sets LEDs using color and index values
    * @param color color to set
    * @param index index to start at
@@ -376,15 +331,7 @@ public class LED extends SubsystemBase {
   public void setLEDs(Color color, int index) {
     candle.setLEDs((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255), 0, index, 1);
   }
-  /**
-   * Sets LEDs using color, index, and count values
-   * @param color color to set
-   * @param index index to start at
-   * @param count number of LEDs
-   */
-  public void setLEDs(Color color, int index, int count) {
-    candle.setLEDs((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255), 0, index, count);
-  }
+  
   /**
    * Sets LEDs using RGB and segment values
    * @param r red value
@@ -394,13 +341,6 @@ public class LED extends SubsystemBase {
    */
   public void setLEDs(int r, int g, int b, LEDSegmentRange segment) {
     candle.setLEDs(r, g, b, 0, segment.index, segment.count);
-  }
-  /**
-   * Sets LEDs using BCR color enum (ex: IDLE)
-   * @param color color to set
-   */
-  public void setLEDs(BCRColor color) {
-    candle.setLEDs(color.r, color.g, color.b);
   }
   
   /**
@@ -419,23 +359,18 @@ public class LED extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(log.isMyLogRotation(logRotationKey)) {
-      if (RobotPreferences.isStickyFaultActive()) {
+    // only update every log rotation as opposed to every 20ms
+    if(log.isMyLogRotation(logRotationKey)) { 
+      // if there is a sticky fault, send sticky fault event
+      if (RobotPreferences.isStickyFaultActive()) { // TODO revisit this to see if it's necessary
         updateState(CANdleEvents.STICKY_FAULT_PRESENT);
-        lastStickyFaultReading = true;
+        lastStickyFaultPresentReading = true;
       }
-      else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultReading) {
+      // if there is no longer a sticky fault, send sticky fault cleared event
+      // in other words, if sticky faults are cleared, send clear event
+      else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultPresentReading) {
         updateState(CANdleEvents.STICKY_FAULTS_CLEARED);
-        lastStickyFaultReading = false;
-      }
-
-      // non-permanent piece detection when robot is disabled
-      if (DriverStation.isDisabled() && !lastIsDisabledReading) {
-        updateState(StripEvents.IDLE);
-        lastIsDisabledReading = true;
-      }
-      else if (!DriverStation.isDisabled() && lastIsDisabledReading) {
-        lastIsDisabledReading = false;
+        lastStickyFaultPresentReading = false;
       }
     }
   }
