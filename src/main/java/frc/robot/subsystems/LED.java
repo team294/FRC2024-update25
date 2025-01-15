@@ -52,7 +52,7 @@ public class LED extends SubsystemBase {
     PIECE_PRESENT,
     SHOOTER_WITHIN_TARGET_VELOCITY,
     RAINBOW,
-    LAST_TEN_SECONDS,
+    MATCH_COUNTDOWN,
     IDLE
   }
 
@@ -60,7 +60,7 @@ public class LED extends SubsystemBase {
     StripEvents.PIECE_PRESENT, 1,
     StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY, 2,
     StripEvents.RAINBOW, 3,
-    StripEvents.LAST_TEN_SECONDS, 4,
+    StripEvents.MATCH_COUNTDOWN, 4,
     StripEvents.IDLE, 5
   );
 
@@ -139,7 +139,7 @@ public class LED extends SubsystemBase {
    * Update strips in the last 10 seconds of the match
    * @param percent percent of the way through the last 10 seconds
    */
-  // TODO implement this
+  // TODO test if this works
   public void updateLastTenSecondsLEDs(double percent) {
     // Generates segment pattern for the left vertical segment based on percent
     Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
@@ -151,6 +151,7 @@ public class LED extends SubsystemBase {
         segmentPatternLeft[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
       }
     }
+
     // Generates segment pattern for the right vertical segment based on percent
     Color[] segmentPatternRight = new Color[LEDSegmentRange.StripRight.count];
     for (int i = 0; i < LEDSegmentRange.StripRight.count; i++) {
@@ -161,6 +162,7 @@ public class LED extends SubsystemBase {
         segmentPatternRight[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
       }
     }
+
     // Generates segment pattern for the horizontal segment based on percent
     Color[] segmentPatternHorizontal = new Color[LEDSegmentRange.StripHorizontal.count];
     for (int i = 0; i < LEDSegmentRange.StripHorizontal.count; i++) {
@@ -171,6 +173,7 @@ public class LED extends SubsystemBase {
         segmentPatternHorizontal[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
       }
     }
+
     // Sets segments based on generated patterns
     setAnimation(segmentPatternLeft, LEDSegmentRange.StripLeft, true);
     setAnimation(segmentPatternRight, LEDSegmentRange.StripRight, true);
@@ -230,7 +233,8 @@ public class LED extends SubsystemBase {
     if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
     switch (event) {
-      case LAST_TEN_SECONDS: // TODO this is never sent, fix
+      // TODO test if this is being sent
+      case MATCH_COUNTDOWN:
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
         Double percent = Math.max(matchTimer.get() - 125, 0) / 10.0;
         updateLastTenSecondsLEDs(percent);
@@ -243,7 +247,9 @@ public class LED extends SubsystemBase {
       case PIECE_PRESENT:
         updateLEDs(BCRColor.PIECE_PRESENT, true);
         break;
-      default: // idle TODO doesn't work, solution theorized
+      // TODO test if this works
+      case IDLE:
+      default:
         switch (currentState) {
           case SHOOTING:
             updateLEDs(BCRColor.SHOOTING, true);
@@ -376,7 +382,8 @@ public class LED extends SubsystemBase {
     // only update every log rotation as opposed to every 20ms
     if(log.isMyLogRotation(logRotationKey)) { 
       // if there is a sticky fault, send sticky fault present event
-      if (RobotPreferences.isStickyFaultActive()) { // TODO revisit to see if !lastStickyFaultPresentReading can be added
+      // TODO revisit this to see if !lastStickyFaultPresentReading can be added
+      if (RobotPreferences.isStickyFaultActive()) {
         updateState(CANdleEvents.STICKY_FAULT_PRESENT);
         lastStickyFaultPresentReading = true;
       }
@@ -384,6 +391,11 @@ public class LED extends SubsystemBase {
       else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultPresentReading) {
         updateState(CANdleEvents.STICKY_FAULTS_CLEARED);
         lastStickyFaultPresentReading = false;
+      }
+
+      // if in last 10 seconds of match, send match countdown event
+      if (matchTimer.get() > 125) {
+        updateState(StripEvents.MATCH_COUNTDOWN);
       }
     }
   }
