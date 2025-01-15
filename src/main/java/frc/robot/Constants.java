@@ -446,16 +446,14 @@ public final class Constants {
 
     /** Colors for the LEDs based on different robot states (see BCRRobotState) */
     public enum BCRColor {
-      IDLE(255, 255, 255), // White             (nothing running)
-      INTAKING(0, 0, 255), // Blue       (intake running)
-      SHOOTING(0, 255, 0), // Green       (shooter running)
-      isRainbow(Color.kBlack),
-      shooterWithinTargetVelocity(0, 255, 0),
-      shooterRPMAboveZero(Color.kPurple),
-      piecePresent(255, 30, 0),
-      wristUncalibrated(255, 255, 0), // CANdle only
-      stickyFaultPresent(255, 0, 0), // CANdle only
-      CANdleDefault(0, 0, 0);
+      IDLE(255, 255, 255), // White   (nothing running)
+      INTAKING(0, 0, 255), // Blue    (intake running)
+      SHOOTING(0, 255, 0), // Green   (shooter running)
+      SHOOTER_WITHIN_TARGET_VELOCITY(0, 255, 0),
+      PIECE_PRESENT(255, 30, 0),
+      WRIST_UNCALIBRATED(255, 255, 0),  // CANdle only
+      STICKY_FAULT_PRESENT(255, 0, 0),  // CANdle only
+      CANdleDefault(0, 0, 0);           // CANdle only
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {

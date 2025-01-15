@@ -100,7 +100,7 @@ public class Feeder extends SubsystemBase implements Loggable{
     stopFeeder();
 
     lastPiecePresentReading = false;
-    led.updateState(StripEvents.idle);
+    led.updateState(StripEvents.IDLE);
   }
 
   /**
@@ -210,12 +210,12 @@ public class Feeder extends SubsystemBase implements Loggable{
 
       // if we have a piece and previously didn't have a piece, update state
       if (isPiecePresent() && !lastPiecePresentReading) {
-        led.updateState(StripEvents.piecePresent);
+        led.updateState(StripEvents.PIECE_PRESENT);
         lastPiecePresentReading = true;
       }
       // if we don't have a piece and previously did have a piece, update state
       else if (!isPiecePresent() && lastPiecePresentReading) {
-          led.updateState(StripEvents.idle);
+          led.updateState(StripEvents.IDLE);
           lastPiecePresentReading = false;
       }
     }

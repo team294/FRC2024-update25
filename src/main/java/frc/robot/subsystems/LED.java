@@ -5,16 +5,15 @@
 package frc.robot.subsystems;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Robot;
 import frc.robot.Constants.BCRColor;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.Constants.LEDConstants.*;
@@ -32,29 +31,48 @@ public class LED extends SubsystemBase {
   private BCRRobotState robotState;
   private BCRRobotState.State currentState;
   private Timer matchTimer;
-  // private boolean shouldClear;
   private CANdleEvents previousEventCANdle;
   private StripEvents previousEventStrip;
   private boolean lastIsDisabledReading = false;
   private boolean lastStickyFaultReading = false;
 
   public enum CANdleEvents {
-    stickyFaultsCleared,
-    stickyFaultPresent,
-    wristUncalibrated,
-    wristCalibrated
+    STICKY_FAULTS_CLEARED,
+    STICKY_FAULT_PRESENT,
+    WRIST_UNCALIBRATED,
+    WRIST_CALIBRATED
   }
+
+  Map<CANdleEvents, Integer> candleEventPriorities = Map.of(
+    CANdleEvents.STICKY_FAULTS_CLEARED, 1,
+    CANdleEvents.STICKY_FAULT_PRESENT, 1,
+    CANdleEvents.WRIST_UNCALIBRATED, 2,
+    CANdleEvents.WRIST_CALIBRATED, 2
+);
 
   public enum StripEvents {
-    piecePresent,
-    shooterWithinTargetVelocity,
-    rainbow,
-    lastTenSeconds,
-    idle
+    PIECE_PRESENT,
+    SHOOTER_WITHIN_TARGET_VELOCITY,
+    RAINBOW,
+    LAST_TEN_SECONDS,
+    IDLE
   }
 
-  private CANdleEvents[] candleEventsArray = CANdleEvents.values();
-  private StripEvents[] stripEventsArray = StripEvents.values();
+  Map<StripEvents, Integer> stripEventPriorities = Map.of(
+    StripEvents.PIECE_PRESENT, 1,
+    StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY, 2,
+    StripEvents.RAINBOW, 3,
+    StripEvents.LAST_TEN_SECONDS, 4,
+    StripEvents.IDLE, 5
+  );
+
+  private int getPriority(CANdleEvents event) {
+    return candleEventPriorities.getOrDefault(event, -1);
+  }
+
+  private int getPriority(StripEvents event) {
+    return stripEventPriorities.getOrDefault(event, -1);
+  }
 
   // private Color[] accuracyDisplayPattern = {Color.kRed, Color.kRed};
   private HashMap<LEDSegmentRange, LEDSegment> segments;
@@ -73,7 +91,6 @@ public class LED extends SubsystemBase {
     this.robotState = robotState;
     this.currentState = BCRRobotState.State.IDLE;
     this.matchTimer = matchTimer;
-    // this.shouldClear = false;
     this.log = log;
     logRotationKey = log.allocateLogRotation();
 
@@ -98,7 +115,6 @@ public class LED extends SubsystemBase {
     this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
     this.robotState = robotState;
     this.currentState = BCRRobotState.State.IDLE;
-    // this.shouldClear = false;
     this.log = log;
     logRotationKey = log.allocateLogRotation();
 
@@ -148,6 +164,11 @@ public class LED extends SubsystemBase {
     setAnimation(segmentPatternHorizontal, LEDSegmentRange.StripHorizontal, true);
   }
 
+  /**
+   * Change the color of the LEDs based on parameters
+   * @param color BCRColor to use (see enum in constants)
+   * @param strip
+   */
   public void updateLEDs(BCRColor color, boolean strip) {
     if (strip) {
       setLEDs(color, LEDSegmentRange.StripLeft);
@@ -160,33 +181,15 @@ public class LED extends SubsystemBase {
   }
 
   public void updateState(CANdleEvents event) {
-    // initialize priorities to -1 in case of a null event
-    int newEventPriority = -1;
-    int previousEventPriority = -1;
-
-    // check priority of previous and new events
-    for (int i = 0; i < candleEventsArray.length; i++) {
-      if (event == candleEventsArray[i]) {
-        newEventPriority = i;
-      }
-
-      if (previousEventCANdle == candleEventsArray[i]) {
-        previousEventPriority = i;
-      }
-    }
-
-    // if new event priority is less than previous event priority, do not update
-    if (newEventPriority < previousEventPriority) return;
+    // if new event priority is less than previous, do not update
+    if (getPriority(event) < getPriority(previousEventCANdle)) return;
 
     switch (event) {
-      case wristCalibrated:
-        updateLEDs(BCRColor.stickyFaultPresent, false);
+      case WRIST_UNCALIBRATED:
+        updateLEDs(BCRColor.WRIST_UNCALIBRATED, false);
         break;
-      case wristUncalibrated:
-        updateLEDs(BCRColor.wristUncalibrated, false);
-        break;
-      case stickyFaultPresent:
-        updateLEDs(BCRColor.stickyFaultPresent, false);
+      case STICKY_FAULT_PRESENT:
+        updateLEDs(BCRColor.STICKY_FAULT_PRESENT, false);
         break;
       default:
         updateLEDs(BCRColor.CANdleDefault, false);
@@ -196,41 +199,28 @@ public class LED extends SubsystemBase {
     previousEventCANdle = event;
   }
 
-  public void updateState(StripEvents event) { // TODO make idle lowest priority but override shoot and piece
+  public void updateState(StripEvents event) {
     // Store the state
     currentState = robotState.getState();
 
-    int newEventPriority = -1;
-    int previousEventPriority = -1;
-
-    for (int i = 0; i < stripEventsArray.length; i++) {
-      if (event == stripEventsArray[i]) {
-        newEventPriority = i;
-      }
-
-      if (previousEventStrip == stripEventsArray[i]) {
-        previousEventPriority = i;
-      }
-    }
-
-    // if new event priority is less than previous event priority, do not update
-    if (newEventPriority < previousEventPriority) return;
+    // only update if last event was idle and new priority is greater than previous
+    if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
     switch (event) {
-      case lastTenSeconds:
+      case LAST_TEN_SECONDS:
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
         Double percent = Math.max(matchTimer.get() - 125, 0) / 10.0;
         updateLastTenSecondsLEDs(percent);
         break;
-      case rainbow:
+      case RAINBOW:
         break;
-      case shooterWithinTargetVelocity:
-        updateLEDs(BCRColor.shooterWithinTargetVelocity, true);
+      case SHOOTER_WITHIN_TARGET_VELOCITY:
+        updateLEDs(BCRColor.SHOOTER_WITHIN_TARGET_VELOCITY, true);
         break;
-      case piecePresent:
-        updateLEDs(BCRColor.piecePresent, true);
+      case PIECE_PRESENT:
+        updateLEDs(BCRColor.PIECE_PRESENT, true);
         break;
-      default: // idle TODO make work
+      default: // idle TODO doesn't work, solution theorized
         switch (currentState) {
           case SHOOTING:
             updateLEDs(BCRColor.SHOOTING, true);
@@ -431,17 +421,17 @@ public class LED extends SubsystemBase {
   public void periodic() {
     if(log.isMyLogRotation(logRotationKey)) {
       if (RobotPreferences.isStickyFaultActive()) {
-        updateState(CANdleEvents.stickyFaultPresent);
+        updateState(CANdleEvents.STICKY_FAULT_PRESENT);
         lastStickyFaultReading = true;
       }
       else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultReading) {
-        updateState(CANdleEvents.stickyFaultsCleared);
+        updateState(CANdleEvents.STICKY_FAULTS_CLEARED);
         lastStickyFaultReading = false;
       }
 
       // non-permanent piece detection when robot is disabled
       if (DriverStation.isDisabled() && !lastIsDisabledReading) {
-        updateState(StripEvents.idle);
+        updateState(StripEvents.IDLE);
         lastIsDisabledReading = true;
       }
       else if (!DriverStation.isDisabled() && lastIsDisabledReading) {
