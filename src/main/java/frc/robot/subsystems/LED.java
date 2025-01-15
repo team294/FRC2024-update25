@@ -394,9 +394,10 @@ public class LED extends SubsystemBase {
       }
 
       // if in last 10 seconds of match, send match countdown event
-      if (matchTimer.get() > 125) {
+      if (matchTimer.get() > 125 && matchTimer.get() <= 135) {
         updateState(StripEvents.MATCH_COUNTDOWN);
       }
+      // TODO fun animation after endgame?
     }
   }
 }
