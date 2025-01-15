@@ -10,7 +10,6 @@ import java.util.Map;
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,7 +32,6 @@ public class LED extends SubsystemBase {
   private Timer matchTimer;
   private CANdleEvents previousEventCANdle;
   private StripEvents previousEventStrip;
-  private boolean lastIsDisabledReading = false;
   private boolean lastStickyFaultPresentReading = false;
 
   public enum CANdleEvents {
@@ -66,10 +64,20 @@ public class LED extends SubsystemBase {
     StripEvents.IDLE, 5
   );
 
+  /**
+   * Get the priority level for an event
+   * @param event CANdleEvents event
+   * @return priority level integer (higher value = higher priority), default is -1
+   */
   private int getPriority(CANdleEvents event) {
     return candleEventPriorities.getOrDefault(event, -1);
   }
 
+  /**
+   * Get the priority level for an event
+   * @param event StripEvents event
+   * @return priority level integer (higher value = higher priority), default is -1
+   */
   private int getPriority(StripEvents event) {
     return stripEventPriorities.getOrDefault(event, -1);
   }
@@ -131,6 +139,7 @@ public class LED extends SubsystemBase {
    * Update strips in the last 10 seconds of the match
    * @param percent percent of the way through the last 10 seconds
    */
+  // TODO implement this
   public void updateLastTenSecondsLEDs(double percent) {
     // Generates segment pattern for the left vertical segment based on percent
     Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
@@ -324,7 +333,7 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Sets LEDs using color and index values
+   * Sets LEDs using color and index value
    * @param color color to set
    * @param index index to start at
    */
@@ -344,7 +353,7 @@ public class LED extends SubsystemBase {
   }
   
   /**
-   * Sets LEDs using robot state (ex: IDLE)
+   * Sets LEDs using index value and a count
    * @param color color to set
    * @param index index to start at
    * @param count number of LEDs
@@ -353,6 +362,11 @@ public class LED extends SubsystemBase {
     candle.setLEDs(color.r, color.g, color.b, 0, index, count);
   }
 
+  /**
+   * Sets LEDs using BCRColor and segment values
+   * @param color BCRColor value
+   * @param segment segment to light up (range)
+   */
   public void setLEDs(BCRColor color, LEDSegmentRange segment) {
     candle.setLEDs(color.r, color.g, color.b, 0, segment.index, segment.count);
   }
@@ -361,13 +375,12 @@ public class LED extends SubsystemBase {
   public void periodic() {
     // only update every log rotation as opposed to every 20ms
     if(log.isMyLogRotation(logRotationKey)) { 
-      // if there is a sticky fault, send sticky fault event
-      if (RobotPreferences.isStickyFaultActive()) { // TODO revisit this to see if it's necessary
+      // if there is a sticky fault, send sticky fault present event
+      if (RobotPreferences.isStickyFaultActive()) { // TODO revisit to see if !lastStickyFaultPresentReading can be added
         updateState(CANdleEvents.STICKY_FAULT_PRESENT);
         lastStickyFaultPresentReading = true;
       }
-      // if there is no longer a sticky fault, send sticky fault cleared event
-      // in other words, if sticky faults are cleared, send clear event
+      // if there is not a sticky fault and there previously was, send sticky fault cleared event
       else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultPresentReading) {
         updateState(CANdleEvents.STICKY_FAULTS_CLEARED);
         lastStickyFaultPresentReading = false;
