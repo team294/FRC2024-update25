@@ -207,7 +207,7 @@ public class LED extends SubsystemBase {
     if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
     switch (event) {
-      case LAST_TEN_SECONDS:
+      case LAST_TEN_SECONDS: // TODO this is never sent, fix
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
         Double percent = Math.max(matchTimer.get() - 125, 0) / 10.0;
         updateLastTenSecondsLEDs(percent);
