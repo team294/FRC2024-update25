@@ -230,13 +230,14 @@ public class LED extends SubsystemBase {
     if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
     // Do not update if last event was piece present and new event is idle.
-    // This prevents LED flashing between orange and white when there is a piece
+    // This prevents LED flashing between orange and white when there is a piece.
     if (previousEventStrip == StripEvents.PIECE_PRESENT && event == StripEvents.IDLE) return;
 
     switch (event) {
       case MATCH_COUNTDOWN:
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
-        Double percent = Math.max(matchTimer.get() - 1, 0) / 10.0;
+        // TODO change back to normal match time
+        double percent = Math.max(matchTimer.get() - 1, 0) / 10.0;
         updateLastTenSecondsLEDs(percent);
         break;
       case RAINBOW:
@@ -385,6 +386,7 @@ public class LED extends SubsystemBase {
       }
 
       // if in last 10 seconds of match, send match countdown event
+      // TODO change back to normal match time
       if (matchTimer.get() > 1 && matchTimer.get() <= 11) {
         updateState(StripEvents.MATCH_COUNTDOWN);
       }
