@@ -234,7 +234,6 @@ public class LED extends SubsystemBase {
     if (previousEventStrip == StripEvents.PIECE_PRESENT && event == StripEvents.IDLE) return;
 
     switch (event) {
-      // TODO test if this is being sent
       case MATCH_COUNTDOWN:
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
         Double percent = Math.max(matchTimer.get() - 1, 0) / 10.0;
@@ -389,7 +388,6 @@ public class LED extends SubsystemBase {
       if (matchTimer.get() > 1 && matchTimer.get() <= 11) {
         updateState(StripEvents.MATCH_COUNTDOWN);
       }
-      // TODO fun animation after endgame?
     }
   }
 }
