@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.Ports;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import static frc.robot.utilities.StringUtil.*;
@@ -60,6 +61,7 @@ public class Intake extends SubsystemBase implements Loggable {
   private final TalonFXConfigurator intakeConfigurator = intakeMotor.getConfigurator();
 	private TalonFXConfiguration intakeConfig;
 	private VoltageOut intakeVoltageControl = new VoltageOut(0.0);
+  private final LED led;
 
   // Create Falcon variables for intake motor
   private final StatusSignal<Voltage> intakeSupplyVoltage;				// Incoming bus voltage to motor controller, in volts
@@ -78,9 +80,10 @@ public class Intake extends SubsystemBase implements Loggable {
    * @param subsystemName
    * @param log
    */
-  public Intake(String subsystemName, FileLog log) {
+  public Intake(String subsystemName, LED led, FileLog log) {
     this.log = log; // save reference to the fileLog
     this.subsystemName = subsystemName;
+    this.led = led;
     logRotationKey = log.allocateLogRotation();
     currentTimer.reset();
     currentTimer.start();
@@ -154,6 +157,12 @@ public class Intake extends SubsystemBase implements Loggable {
    */
   public void setIntakePercentOutput(double percent){
     intakeMotor.setControl(intakeVoltageControl.withOutput(percent*IntakeConstants.compensationVoltage));
+    if (percent > 0) {
+      led.updateState(StripEvents.INTAKING);
+    }
+    else {
+      led.updateState(StripEvents.IDLE);
+    }
   }
 
   /**

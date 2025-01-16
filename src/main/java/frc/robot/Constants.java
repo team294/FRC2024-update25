@@ -448,12 +448,11 @@ public final class Constants {
     public enum BCRColor {
       IDLE(255, 255, 255), // White   (nothing running)
       INTAKING(0, 0, 255), // Blue    (intake running)
-      SHOOTING(0, 255, 0), // Green   (shooter running)
       SHOOTER_WITHIN_TARGET_VELOCITY(0, 255, 0),
       PIECE_PRESENT(255, 30, 0),
       WRIST_UNCALIBRATED(255, 255, 0),  // CANdle only
       STICKY_FAULT_PRESENT(255, 0, 0),  // CANdle only
-      CANDLE_DEFAULT(0, 0, 0);          // CANdle only
+      CANDLE_IDLE(0, 0, 0);          // CANdle only
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {

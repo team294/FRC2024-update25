@@ -59,7 +59,7 @@ public class RobotContainer {
   
   // Define robot subsystems  
   private final DriveTrain driveTrain = new DriveTrain(allianceSelection, log);
-  private final Intake intake = new Intake("Intake", log);
+  private final Intake intake = new Intake("Intake", led, log);
   private final Shooter shooter = new Shooter(log, led);
   private final Feeder feeder = new Feeder(log, led);
   private final Wrist wrist = new Wrist(log, led);

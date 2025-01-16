@@ -100,7 +100,6 @@ public class Feeder extends SubsystemBase implements Loggable{
     stopFeeder();
 
     lastPiecePresentReading = false;
-    led.updateState(StripEvents.IDLE);
   }
 
   /**
