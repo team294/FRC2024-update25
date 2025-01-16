@@ -472,7 +472,7 @@ public final class Constants {
   }
 
     public static final class LEDConstants {
-      public static final double accuracyDisplayThreshold = 35; //TODO Decide what the threshold should be
+      public static final double accuracyDisplayThreshold = 35; // TODO Decide what the threshold should be
 
       public static final class Patterns {
           // Static Patterns
@@ -492,10 +492,11 @@ public final class Constants {
       }
 
       public enum LEDSegmentRange {
+          // TODO test the changed ranges for the strips
           CANdle(0,8), // Whole CANdle
-          StripLeft(32, 29),  // Left strip only -- D5:  Updated for 2 less LEDs
-          StripRight(61, 30), // Right strip only -- D5:  Updated for 2 less LEDs
-          StripHorizontal(8, 24); // Horizontal strip only -- D5:  Updated for 2 less LEDs
+          StripLeft(31,29),  // Left strip only
+          StripRight(60,29), // Right strip only
+          StripHorizontal(8,23); // Horizontal strip only
 
           public final int index, count;
           LEDSegmentRange(int index, int count) {

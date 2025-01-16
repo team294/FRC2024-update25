@@ -100,9 +100,6 @@ public class LED extends SubsystemBase {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
 
-    // this.accuracyDisplayThreshold = 35;
-    // this.accuracy = 0;
-
     // Create the LED segments
     for (LEDSegmentRange segment : LEDSegmentRange.values()) {
       segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
@@ -122,9 +119,6 @@ public class LED extends SubsystemBase {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
 
-    // this.accuracyDisplayThreshold = 35;
-    // this.accuracy = 0;
-
     // Create the LED segments
     for (LEDSegmentRange segment : LEDSegmentRange.values()) {
       segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
@@ -135,45 +129,48 @@ public class LED extends SubsystemBase {
    * Update strips in the last 10 seconds of the match
    * @param percent percent of the way through the last 10 seconds
    */
-  // TODO test if this works - it doesnt :()
+  // TODO test if this works, partially untested
   public void updateLastTenSecondsLEDs(double percent) {
     // Generates segment pattern for the left vertical segment based on percent
     Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
+    LEDSegment segmentLeft = segments.get(LEDSegmentRange.StripLeft);
     for (int i = 0; i < segmentPatternLeft.length; i++) {
       if (i >= (1.0 - percent) * segmentPatternLeft.length) {
         segmentPatternLeft[i] = Color.kRed;
-      } else {
-        Color[] frame = segments.get(LEDSegmentRange.StripLeft).getCurrentFrame();
-        if (frame.length > 0) segmentPatternLeft[i] = frame[Math.min(frame.length - 1, i)];
+      } else if (segmentLeft != null) {
+        Color[] frame = segmentLeft.getCurrentFrame();
+        segmentPatternLeft[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
       }
     }
 
-    // // Generates segment pattern for the right vertical segment based on percent
-    // Color[] segmentPatternRight = new Color[LEDSegmentRange.StripRight.count];
-    // for (int i = 0; i < segmentPatternRight.length; i++) {
-    //   if (i < percent * segmentPatternRight.length) {
-    //     segmentPatternRight[i] = Color.kRed;
-    //   } else {
-    //     Color[] frame = segments.get(LEDSegmentRange.StripRight).getCurrentFrame();
-    //     segmentPatternRight[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-    //   }
-    // }
+    // Generates segment pattern for the right vertical segment based on percent
+    Color[] segmentPatternRight = new Color[LEDSegmentRange.StripRight.count];
+    LEDSegment segmentRight = segments.get(LEDSegmentRange.StripRight);
+    for (int i = 0; i < segmentPatternRight.length; i++) {
+      if (i < percent * segmentPatternRight.length) {
+        segmentPatternRight[i] = Color.kRed;
+      } else if (segmentRight != null) {
+        Color[] frame = segmentRight.getCurrentFrame();
+        segmentPatternRight[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
+      }
+    }
 
-    // // Generates segment pattern for the horizontal segment based on percent
-    // Color[] segmentPatternHorizontal = new Color[LEDSegmentRange.StripHorizontal.count];
-    // for (int i = 0; i < segmentPatternHorizontal.length; i++) {
-    //   if (i < percent * segmentPatternHorizontal.length) {
-    //     segmentPatternHorizontal[i] = Color.kRed;
-    //   } else {
-    //     Color[] frame = segments.get(LEDSegmentRange.StripHorizontal).getCurrentFrame();
-    //     segmentPatternHorizontal[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-    //   }
-    // }
+    // Generates segment pattern for the horizontal segment based on percent
+    Color[] segmentPatternHorizontal = new Color[LEDSegmentRange.StripHorizontal.count];
+    LEDSegment segmentHorizontal = segments.get(LEDSegmentRange.StripHorizontal);
+    for (int i = 0; i < segmentPatternHorizontal.length; i++) {
+      if (i < percent * segmentPatternHorizontal.length) {
+        segmentPatternHorizontal[i] = Color.kRed;
+      } else if (segmentHorizontal != null) {
+        Color[] frame = segmentHorizontal.getCurrentFrame();
+        segmentPatternHorizontal[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
+      }
+    }
 
-    // Sets segments based on generated patterns
-    // setAnimation(segmentPatternLeft, LEDSegmentRange.StripLeft, true);
-    // setAnimation(segmentPatternRight, LEDSegmentRange.StripRight, true);
-    // setAnimation(segmentPatternHorizontal, LEDSegmentRange.StripHorizontal, true);
+    // Sets segment ranges based on generated patterns
+    setAnimation(segmentPatternLeft, LEDSegmentRange.StripLeft, true);
+    setAnimation(segmentPatternRight, LEDSegmentRange.StripRight, true);
+    setAnimation(segmentPatternHorizontal, LEDSegmentRange.StripHorizontal, true);
   }
 
   /**
