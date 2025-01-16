@@ -158,10 +158,10 @@ public class Intake extends SubsystemBase implements Loggable {
   public void setIntakePercentOutput(double percent){
     intakeMotor.setControl(intakeVoltageControl.withOutput(percent*IntakeConstants.compensationVoltage));
     if (percent > 0) {
-      led.updateState(StripEvents.INTAKING);
+      led.sendEvent(StripEvents.INTAKING);
     }
     else {
-      led.updateState(StripEvents.IDLE);
+      led.sendEvent(StripEvents.IDLE);
     }
   }
 

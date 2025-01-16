@@ -99,7 +99,7 @@ public class Wrist extends SubsystemBase implements Loggable{
     subsystemName = "Wrist";
     this.led = led;
 
-    led.updateState(CANdleEvents.WRIST_UNCALIBRATED); // wrist is initially uncalibrated
+    led.sendEvent(CANdleEvents.WRIST_UNCALIBRATED); // wrist is initially uncalibrated
 
 		// Start with factory default TalonFX configuration
 		wristMotor1Config = new TalonFXConfiguration();			// Factory default configuration
@@ -446,7 +446,7 @@ public class Wrist extends SubsystemBase implements Loggable{
 			"Wrist Angle", getWristAngle(), "Wrist Target", getCurrentWristTarget());
 
     wristCalibrated = false;
-    led.updateState(CANdleEvents.WRIST_UNCALIBRATED); // wrist is uncalibrated
+    led.sendEvent(CANdleEvents.WRIST_UNCALIBRATED); // wrist is uncalibrated
   }
 
   /**
@@ -461,7 +461,7 @@ public class Wrist extends SubsystemBase implements Loggable{
     wristCalZero2 = getWristEncoder2RotationsRaw()* kWristDegreesPerRotation - angle;
 		wristCalibrated = true;
 
-    led.updateState(CANdleEvents.WRIST_CALIBRATED); // wrist is calibrated
+    led.sendEvent(CANdleEvents.WRIST_CALIBRATED); // wrist is calibrated
 
     log.writeLog(true, "Wrist", "Calibrate wrist", "zero value", wristCalZero, 
 			"Rev angle", getRevEncoderDegrees(), "Enc Raw", getWristEncoderRotationsRaw(),
@@ -643,7 +643,7 @@ public class Wrist extends SubsystemBase implements Loggable{
       calibrationStickyFaultReported = true;
       RobotPreferences.recordStickyFaults("Wrist-Not-calibrated-when-enabled", log);
       log.writeLogEcho(true, subsystemName, "calibrate Wrist", "Wrist calibrated", false);
-      led.updateState(CANdleEvents.WRIST_UNCALIBRATED); // wrist is uncalibrated
+      led.sendEvent(CANdleEvents.WRIST_UNCALIBRATED); // wrist is uncalibrated
     }
 
     // If the driver station is disabled, then turn off any position control for the wrist motor

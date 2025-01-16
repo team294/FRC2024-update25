@@ -34,7 +34,7 @@ public class CANdleRainbowAnimation extends Command {
   public void initialize() {
     RainbowAnimation anim = new RainbowAnimation(1, .7, segment.count, false, segment.index);
     led.animate(anim);
-    led.updateState(StripEvents.RAINBOW);
+    led.sendEvent(StripEvents.RAINBOW);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -45,7 +45,7 @@ public class CANdleRainbowAnimation extends Command {
   @Override
   public void end(boolean interrupted) {
     led.clearAnimation();
-    led.updateState(StripEvents.IDLE);
+    led.sendEvent(StripEvents.IDLE);
   }
 
   // Returns true when the command should end.

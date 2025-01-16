@@ -209,12 +209,12 @@ public class Feeder extends SubsystemBase implements Loggable{
 
       // if we have a piece and previously didn't have a piece, update state
       if (isPiecePresent() && !lastPiecePresentReading) {
-        led.updateState(StripEvents.PIECE_PRESENT);
+        led.sendEvent(StripEvents.PIECE_PRESENT);
         lastPiecePresentReading = true;
       }
       // if we don't have a piece and previously did have a piece, update state
       else if (!isPiecePresent() && lastPiecePresentReading) {
-          led.updateState(StripEvents.IDLE);
+          led.sendEvent(StripEvents.IDLE);
           lastPiecePresentReading = false;
       }
     }

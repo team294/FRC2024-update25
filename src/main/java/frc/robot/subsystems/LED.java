@@ -39,7 +39,7 @@ public class LED extends SubsystemBase {
     WRIST_CALIBRATED
   }
 
-  Map<CANdleEvents, Integer> candleEventPriorities = Map.of(
+  Map<CANdleEvents, Integer> prioritiesCANdleEvents = Map.of(
     CANdleEvents.STICKY_FAULTS_CLEARED, 1,
     CANdleEvents.STICKY_FAULT_PRESENT, 1,
     CANdleEvents.WRIST_UNCALIBRATED, 1,
@@ -55,7 +55,7 @@ public class LED extends SubsystemBase {
     IDLE
   }
 
-  Map<StripEvents, Integer> stripEventPriorities = Map.of(
+  Map<StripEvents, Integer> prioritiesStripEvents = Map.of(
     StripEvents.INTAKING, 0,
     StripEvents.PIECE_PRESENT, 1,
     StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY, 2,
@@ -65,21 +65,21 @@ public class LED extends SubsystemBase {
   );
 
   /**
-   * Get the priority level for an event
+   * Get the priority level for an event.
    * @param event CANdleEvents event
    * @return priority level integer (higher value = higher priority), default is -1
    */
   private int getPriority(CANdleEvents event) {
-    return event != null ? candleEventPriorities.getOrDefault(event, -1) : -1;
+    return event != null ? prioritiesCANdleEvents.getOrDefault(event, -1) : -1;
   }
 
   /**
-   * Get the priority level for an event
+   * Get the priority level for an event.
    * @param event StripEvents event
    * @return priority level integer (higher value = higher priority), default is -1
    */
   private int getPriority(StripEvents event) {
-    return event != null ? stripEventPriorities.getOrDefault(event, -1) : -1;
+    return event != null ? prioritiesStripEvents.getOrDefault(event, -1) : -1;
   }
 
   // private Color[] accuracyDisplayPattern = {Color.kRed, Color.kRed};
@@ -126,11 +126,11 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Update strips in the last 10 seconds of the match
-   * @param percent percent of the way through the last 10 seconds
+   * Update strips for a countdown animation.
+   * @param percent 0-1 progress through the countdown
    */
   // TODO test if this works, partially untested
-  public void updateLastTenSecondsLEDs(double percent) {
+  public void updateLEDsCountdown(double percent) {
     // Generates segment pattern for the left vertical segment based on percent
     Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
     LEDSegment segmentLeft = segments.get(LEDSegmentRange.StripLeft);
@@ -174,8 +174,8 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Change the color of the LEDs based on parameters
-   * @param color BCRColor to use (see enum in constants)
+   * Change the color of the LEDs.
+   * @param color BCRColor to make LEDs (solid)
    * @param strip true = update strips, false = update CANdle
    */
   public void updateLEDs(BCRColor color, boolean strip) {
@@ -190,15 +190,14 @@ public class LED extends SubsystemBase {
   }
 
   /**
-   * Update the CANdle based on the state
-   * @param event CANdle event to use
+   * Send an event to the CANdle and update LEDs if necessary.
+   * @param event CANdle event
    */
-  public void updateState(CANdleEvents event) {
-    // if the new event is sticky fault present and the previous 
-    // event caused a sticky fault, do not update
+  public void sendEvent(CANdleEvents event) {
+    // Do not update if the new event is sticky fault present and the previous event caused a sticky fault
     if (previousEventCANdle == CANdleEvents.WRIST_UNCALIBRATED && event == CANdleEvents.STICKY_FAULT_PRESENT) return;
 
-    // if new event priority is less than previous, do not update
+    // Do not update if the new event priority is less than the previous
     if (getPriority(event) < getPriority(previousEventCANdle)) return;
 
     switch (event) {
@@ -213,21 +212,21 @@ public class LED extends SubsystemBase {
         break;
     }
 
-    // Update previous event for CANdle to event that just happened
+    // Update previous event since we updated the LEDs
     previousEventCANdle = event;
   }
 
   /**
-   * Update the LED Strips based on the state
-   * @param event Strip event to use
+   * Send an event to the Strips and update LEDs if necessary.
+   * @param event Strip event
    */
-  public void updateState(StripEvents event) {
-    // Do not update state if last event was not idle and the new priority is 
-    // less than the previous. Always update state if previous event was idle.
+  public void sendEvent(StripEvents event) {
+    // Always update state if previous event was idle
+    // Do not update if last event was not idle and the new event priority is less than the previous
     if (previousEventStrip != StripEvents.IDLE && getPriority(event) < getPriority(previousEventStrip)) return;
 
-    // Do not update if last event was piece present and new event is idle.
-    // This prevents LED flashing between orange and white when there is a piece.
+    // Do not update if last event was piece present and new event is idle
+    // This prevents LED flashing between orange and white when there is a piece
     if (previousEventStrip == StripEvents.PIECE_PRESENT && event == StripEvents.IDLE) return;
 
     switch (event) {
@@ -235,9 +234,10 @@ public class LED extends SubsystemBase {
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
         // TODO change back to normal match time
         double percent = Math.max(matchTimer.get() - 1, 0) / 10.0;
-        updateLastTenSecondsLEDs(percent);
+        updateLEDsCountdown(percent);
         break;
       case RAINBOW:
+        // TODO why is there no update here?
         break;
       case SHOOTER_WITHIN_TARGET_VELOCITY:
         updateLEDs(BCRColor.SHOOTER_WITHIN_TARGET_VELOCITY, true);
@@ -253,13 +253,13 @@ public class LED extends SubsystemBase {
         break;
     }
 
-    // Update previous event for strips to event that just happened
+    // Update previous event since we updated the LEDs
     previousEventStrip = event;
   }
 
   /** 
-   * Get the subsystem's name
-   * @return the name of the subsystem
+   * Get the subsystem's name.
+   * @return subsystem name as a string
    */
   public String getName() {
     return subsystemName;
@@ -373,19 +373,19 @@ public class LED extends SubsystemBase {
       // if there is a sticky fault, send sticky fault present event
       // TODO revisit this to see if !lastStickyFaultPresentReading can be added
       if (RobotPreferences.isStickyFaultActive()) {
-        updateState(CANdleEvents.STICKY_FAULT_PRESENT);
+        sendEvent(CANdleEvents.STICKY_FAULT_PRESENT);
         lastStickyFaultPresentReading = true;
       }
       // if there is not a sticky fault and there previously was, send sticky fault cleared event
       else if (!RobotPreferences.isStickyFaultActive() && lastStickyFaultPresentReading) {
-        updateState(CANdleEvents.STICKY_FAULTS_CLEARED);
+        sendEvent(CANdleEvents.STICKY_FAULTS_CLEARED);
         lastStickyFaultPresentReading = false;
       }
 
       // if in last 10 seconds of match, send match countdown event
       // TODO change back to normal match time
       if (matchTimer.get() > 1 && matchTimer.get() <= 11) {
-        updateState(StripEvents.MATCH_COUNTDOWN);
+        sendEvent(StripEvents.MATCH_COUNTDOWN);
       }
     }
   }
