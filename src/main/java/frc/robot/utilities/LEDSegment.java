@@ -2,6 +2,7 @@ package frc.robot.utilities;
 
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.Constants;
+import frc.robot.Constants.BCRColor;
 
 /** LED segment defines a range of LEDs and its current animation */
 public class LEDSegment {
@@ -61,6 +62,17 @@ public class LEDSegment {
     public void setAnimation(Color color) {
         Color[][] anim = {{color}};
         setAnimation(anim, true);
+    }
+
+    /**
+     * Set/reset the color of the segment
+     * @param r red value (max 255)
+     * @param g green value (max 255)
+     * @param b blue value (max 255)
+     */
+    public void setAnimation(int r, int g, int b) {
+        Color color = new Color(r, g, b);
+        setAnimation(color);
     }
 
     public Color[] getCurrentFrame() {

@@ -446,20 +446,33 @@ public final class Constants {
 
     /** Colors for the LEDs based on different robot states (see BCRRobotState) */
     public enum BCRColor {
-      IDLE(255, 255, 255), // White             (nothing running)
-      INTAKING(0, 0, 255), // Blue       (intake running)
-      SHOOTING(0, 255, 0); // Green       (shooter running)
+      IDLE(255, 255, 255), // White   (nothing running)
+      INTAKING(0, 0, 255), // Blue    (intake running)
+      SHOOTER_WITHIN_TARGET_VELOCITY(0, 255, 0),
+      PIECE_PRESENT(255, 30, 0),
+      WRIST_UNCALIBRATED(255, 255, 0),  // CANdle only
+      STICKY_FAULT_PRESENT(255, 0, 0),  // CANdle only
+      CANDLE_IDLE(0, 0, 0);          // CANdle only
 
       public final int r, g, b;
       BCRColor(int r, int g, int b) {
           this.r = r;
           this.g = g;
           this.b = b;
+          this.col = Color.kBlack;
+      }
+
+      public final Color col;
+      BCRColor (Color c) {
+        this.r = 0;
+        this.g = 0;
+        this.b = 0;
+        this.col = c;
       }
   }
 
     public static final class LEDConstants {
-      public static final double accuracyDisplayThreshold = 35; //TODO Decide what the threshold should be
+      public static final double accuracyDisplayThreshold = 35; // TODO Decide what the threshold should be
 
       public static final class Patterns {
           // Static Patterns
@@ -479,10 +492,11 @@ public final class Constants {
       }
 
       public enum LEDSegmentRange {
+          // TODO test the changed ranges for the strips
           CANdle(0,8), // Whole CANdle
-          StripLeft(32, 29),  // Left strip only -- D5:  Updated for 2 less LEDs
-          StripRight(61, 30), // Right strip only -- D5:  Updated for 2 less LEDs
-          StripHorizontal(8, 24); // Horizontal strip only -- D5:  Updated for 2 less LEDs
+          StripLeft(31,29),  // Left strip only
+          StripRight(60,29), // Right strip only
+          StripHorizontal(8,23); // Horizontal strip only
 
           public final int index, count;
           LEDSegmentRange(int index, int count) {

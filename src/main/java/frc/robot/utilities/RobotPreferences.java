@@ -79,7 +79,7 @@ public class RobotPreferences {
      * @param defaultValue Default value if the key doesn't already exist
      * @return Value from RoboRIO preferences, or default value if it didn't exist
      */
-    private static String readString(String keyName, String defaultValue) {
+    public static String readString(String keyName, String defaultValue) {
 		if (!Preferences.containsKey(keyName)){
             Preferences.setString(keyName, defaultValue);
         } 

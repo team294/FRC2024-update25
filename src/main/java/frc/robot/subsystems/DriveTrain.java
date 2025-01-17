@@ -562,26 +562,26 @@ public class DriveTrain extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber("Drive Odometry Y", pose.getTranslation().getY());
       SmartDashboard.putNumber("Drive Odometry Theta", pose.getRotation().getDegrees());
 
-      SmartDashboard.putData("Swerve Drive", new Sendable() {
-        @Override
-        public void initSendable(SendableBuilder builder) {
-          builder.setSmartDashboardType("SwerveDrive");
+      // SmartDashboard.putData("Swerve Drive", new Sendable() {
+      //   @Override
+      //   public void initSendable(SendableBuilder builder) {
+      //     builder.setSmartDashboardType("SwerveDrive");
 
-          builder.addDoubleProperty("Front Left Angle", () -> swerveFrontLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
-          builder.addDoubleProperty("Front Left Velocity", () -> swerveFrontLeft.getDriveEncoderVelocity(), null);
+      //     builder.addDoubleProperty("Front Left Angle", () -> swerveFrontLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
+      //     builder.addDoubleProperty("Front Left Velocity", () -> swerveFrontLeft.getDriveEncoderVelocity(), null);
 
-          builder.addDoubleProperty("Front Right Angle", () -> swerveFrontRight.getTurningEncoderDegrees()*(Math.PI/180), null);
-          builder.addDoubleProperty("Front Right Velocity", () -> swerveFrontRight.getDriveEncoderVelocity(), null);
+      //     builder.addDoubleProperty("Front Right Angle", () -> swerveFrontRight.getTurningEncoderDegrees()*(Math.PI/180), null);
+      //     builder.addDoubleProperty("Front Right Velocity", () -> swerveFrontRight.getDriveEncoderVelocity(), null);
 
-          builder.addDoubleProperty("Back Left Angle", () -> swerveBackLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
-          builder.addDoubleProperty("Back Left Velocity", () -> swerveBackLeft.getDriveEncoderVelocity(), null);
+      //     builder.addDoubleProperty("Back Left Angle", () -> swerveBackLeft.getTurningEncoderDegrees()*(Math.PI/180), null);
+      //     builder.addDoubleProperty("Back Left Velocity", () -> swerveBackLeft.getDriveEncoderVelocity(), null);
 
-          builder.addDoubleProperty("Back Right Angle", () -> swerveBackRight.getTurningEncoderDegrees()*(Math.PI/180), null);
-          builder.addDoubleProperty("Back Right Velocity", () -> swerveBackRight.getDriveEncoderVelocity(), null);
+      //     builder.addDoubleProperty("Back Right Angle", () -> swerveBackRight.getTurningEncoderDegrees()*(Math.PI/180), null);
+      //     builder.addDoubleProperty("Back Right Velocity", () -> swerveBackRight.getDriveEncoderVelocity(), null);
 
-          builder.addDoubleProperty("Robot Angle", () -> getGyroRotation()*(Math.PI/180), null);
-        }
-      });
+      //     builder.addDoubleProperty("Robot Angle", () -> getGyroRotation()*(Math.PI/180), null);
+      //   }
+      // });
       // using vision to update odometry
       SmartDashboard.putBoolean("Vision Updating Odometry", useVisionForOdometry);
 
