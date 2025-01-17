@@ -335,27 +335,6 @@ public class LED extends SubsystemBase {
   public void setLEDs(Color color, int index) {
     candle.setLEDs((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue * 255), 0, index, 1);
   }
-  
-  /**
-   * Sets LEDs using RGB and segment values
-   * @param r red value
-   * @param g green value
-   * @param b blue value
-   * @param segment segment to light up (range)
-   */
-  public void setLEDs(int r, int g, int b, LEDSegmentRange segment) {
-    candle.setLEDs(r, g, b, 0, segment.index, segment.count);
-  }
-  
-  /**
-   * Sets LEDs using index value and a count
-   * @param color color to set
-   * @param index index to start at
-   * @param count number of LEDs
-   */
-  public void setLEDs(BCRColor color, int index, int count) {
-    candle.setLEDs(color.r, color.g, color.b, 0, index, count);
-  }
 
   /**
    * Sets LEDs using BCRColor and segment values
