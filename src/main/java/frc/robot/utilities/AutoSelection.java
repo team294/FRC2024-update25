@@ -24,27 +24,36 @@ import frc.robot.subsystems.Wrist;
  */
 public class AutoSelection {
 
-	public static final int NONE = 0;
-	public static final int test = 1;
-	public static final int shootOne = 2;
-	public static final int CenterTwoPieceShoot = 3;
-	public static final int SourceTwoPieceShoot = 4;
-	public static final int AmpTwoPieceShoot = 5;
-	public static final int AmpThreePieceShoot = 6;
-	public static final int CenterSourceThreePieceShoot = 7;
-	public static final int CenterFourPieceShoot = 8;
-	public static final int SourceShootOnePiece = 9;
-	public static final int AmpShootOnePiece = 10;
-	public static final int SourceThreePieceCenter = 11;
-	public static final int CenterFivePieceShootNextToEdge = 12;
-	public static final int CenterFivePieceShootEdge = 13;
-	public static final int AmpFourPieceCenter = 14;
-	public static final int AlternetSourceThreeNoteCenter = 15;
-	public static final int SourceFourNoteCenter = 16;
-	public static final int SourceFifthNote = 17;
-	public static final int SourceFifthNoteAndShoot = 18;
-	public static final int SourceWallMobilityAuto = 19;
-	public static final int AmpThreePieceCenter = 20;
+	public enum AutoSelectionOption {
+		NONE("None", 0),
+		test("Test", 1),
+		shootOne("OnePieceShoot", 2),
+		CenterTwoPieceShoot("CenterTwoPieceShoot", 3),
+		SourceTwoPieceShoot("SourceTwoPieceShoot", 4),
+		AmpTwoPieceShoot("AmpTwoPieceShoot", 5),
+		AmpThreePieceShoot("AmpThreePieceShoot", 6),
+		CenterSourceThreePieceShoot("CenterThreePieceShootAmp", 7),
+		CenterFourPieceShoot("CenterFourPieceNearNoteAuto", 8),
+		SourceShootOnePiece("SourceShootOnePiece", 9),
+		AmpShootOnePiece("AmpShootOnePiece", 10),
+		SourceThreePieceCenter("SourceThreePieceCenter", 11),
+		CenterFivePieceShootNextToEdge("CenterFivePieceShootNextToEdge", 12),
+		CenterFivePieceShootEdge("CenterFivePieceShootEdge", 13),
+		AmpFourPieceCenter("AmpFourPieceCenter", 14),
+		AlternetSourceThreeNoteCenter("AlternetSourceThreeNoteCenter", 15),
+		SourceFourNoteCenter("SourceFourNoteCenter", 16),
+		SourceFifthNote("SourceFifthNote", 17),
+		SourceFifthNoteAndShoot("SourceFifthNoteAndShoot", 18),
+		SourceWallMobilityAuto("SourceMobilityIntoSide", 19),
+		AmpThreePieceCenter("AmpThreePieceCenter", 20);
+
+			@SuppressWarnings({"MemberName", "PMD.SingularField"})	
+			public final String name;
+		public final int value;
+		AutoSelectionOption(String name, int value) { this.name = name; this.value = value; }
+
+	}
+
 
 	private final AllianceSelection allianceSelection;
 	private final TrajectoryCache trajectoryCache;
@@ -59,26 +68,11 @@ public class AutoSelection {
 		this.allianceSelection = allianceSelection;
 
 		// auto selections
-		autoChooser.setDefaultOption("None", NONE);
-		autoChooser.addOption("CenterTwoPieceShoot", CenterTwoPieceShoot);
-		autoChooser.addOption("SourceTwoPieceShoot", SourceTwoPieceShoot);
-		// autoChooser.addOption("AmpTwoPieceShoot", AmpTwoPieceShoot);
-		// autoChooser.addOption("AmpThreePieceShoot", AmpThreePieceShoot);
-		// autoChooser.addOption("OnePieceShoot", shootOne);
-		autoChooser.addOption("CenterThreePieceShootAmp", CenterSourceThreePieceShoot);
-		autoChooser.addOption("SourceShootOnePiece", SourceShootOnePiece);
-		autoChooser.addOption("AmpShootOnePiece", AmpShootOnePiece);
-		autoChooser.addOption("CenterFourPieceNearNoteAuto", CenterFourPieceShoot);
-		autoChooser.addOption("CenterFivePieceShootNextToEdge", CenterFivePieceShootNextToEdge);
-		autoChooser.addOption("CenterFivePieceShootEdge", CenterFivePieceShootEdge);
-		autoChooser.addOption("AmpFourPieceCenter", AmpFourPieceCenter);
-		autoChooser.addOption("SourceThreePieceCenter", SourceThreePieceCenter);
-		autoChooser.addOption("AlternetSourceThreeNoteCenter", AlternetSourceThreeNoteCenter);
-		autoChooser.addOption("SourceFourNoteCenter", SourceFourNoteCenter);
-		autoChooser.addOption("SourceFifthNote", SourceFifthNote);
-		autoChooser.addOption("SourceFifthNoteAndShoot", SourceFifthNoteAndShoot);
-		autoChooser.addOption("SourceMobilityIntoSide", SourceWallMobilityAuto);
-		autoChooser.addOption("AmpThreePieceCenter", AmpThreePieceCenter);
+		autoChooser.setDefaultOption(AutoSelectionOption.NONE.name, AutoSelectionOption.NONE.value);
+		for (AutoSelectionOption option : AutoSelectionOption.values()) {
+			if (option == AutoSelectionOption.NONE) continue;
+			autoChooser.addOption(option.name, option.value);
+		}
 
 
 
@@ -112,108 +106,108 @@ public class AutoSelection {
 		double waitTime = SmartDashboard.getNumber("Autonomous delay", 0);
 		waitTime = MathUtil.clamp(waitTime, 0, 15);		// make sure autoDelay isn't negative and is only active during auto
 
-		if (autoPlan == NONE) {
+		if (autoPlan == AutoSelectionOption.NONE.value) {
 			// Starting position = facing drivers
 			log.writeLogEcho(true, "AutoSelect", "run None");
 			autonomousCommandMain = new DriveResetPose(180, false, driveTrain, log);
 		}
 
-		else if(autoPlan == test){
+		else if(autoPlan == AutoSelectionOption.test.value){
 			log.writeLogEcho(true, "AutoSelect", "run Test");
 			autonomousCommandMain = new DriveTrajectory(CoordType.kRelative, StopType.kCoast, trajectoryCache.cache[TrajectoryCache.TrajectoryType.test.value].red, driveTrain, log);
 		}
 
-		else if(autoPlan == shootOne){
+		else if(autoPlan == AutoSelectionOption.shootOne.value){
 			log.writeLogEcho(true, "AutoSelect", "run One Piece Shoot");
 			autonomousCommandMain = new ShootPiece(true, shooter, feeder, wrist, robotState, log);
 		}
 
-		else if(autoPlan == CenterTwoPieceShoot){
+		else if(autoPlan == AutoSelectionOption.CenterTwoPieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Center Two Piece Shoot");
 			autonomousCommandMain = new CenterTwoPieceShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceTwoPieceShoot){
+		else if(autoPlan == AutoSelectionOption.SourceTwoPieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Two Piece Shoot");
 			autonomousCommandMain = new SourceTwoPieceShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == AmpTwoPieceShoot){
+		else if(autoPlan == AutoSelectionOption.AmpTwoPieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Amp Two Piece Shoot");
 			autonomousCommandMain = new AmpTwoPieceShoot(intake, shooter, driveTrain, feeder, wrist, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == CenterSourceThreePieceShoot){
+		else if(autoPlan == AutoSelectionOption.CenterSourceThreePieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Center Three Piece Shoot");
 			autonomousCommandMain = new CenterThreePieceShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == AmpThreePieceShoot){
+		else if(autoPlan == AutoSelectionOption.AmpThreePieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Amp Three Piece Shoot");
 			autonomousCommandMain = new AmpThreePieceShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 		
-		else if(autoPlan == CenterFourPieceShoot){
+		else if(autoPlan == AutoSelectionOption.CenterFourPieceShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Center Four Piece Shoot");
 			autonomousCommandMain = new CenterFourPieceShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceShootOnePiece){
+		else if(autoPlan == AutoSelectionOption.SourceShootOnePiece.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source One Piece Shoot");
 			autonomousCommandMain = new SourceShootOnePiece(intake, wrist, shooter, driveTrain, feeder, robotState, allianceSelection, log);
 		}
 
-        else if(autoPlan == AmpShootOnePiece){
+        else if(autoPlan == AutoSelectionOption.AmpShootOnePiece.value){
 			log.writeLogEcho(true, "AutoSelect", "run Amp One Piece Shoot");
 			autonomousCommandMain = new AmpShootOnePiece(intake, wrist, shooter, driveTrain, feeder, robotState, allianceSelection, log);
 		}
 		
-        else if(autoPlan == SourceThreePieceCenter){
+        else if(autoPlan == AutoSelectionOption.SourceThreePieceCenter.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Three Piece Center");
 			autonomousCommandMain = new SourceThreeNoteCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == CenterFivePieceShootNextToEdge){
+		else if(autoPlan == AutoSelectionOption.CenterFivePieceShootNextToEdge.value){
 			log.writeLogEcho(true, "AutoSelect", "run Center Five Piece Shoot Next To Edge");
 			autonomousCommandMain = new CenterFivePieceShootNextToEdge(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
-		else if(autoPlan == CenterFivePieceShootEdge){
+		else if(autoPlan == AutoSelectionOption.CenterFivePieceShootEdge.value){
 			log.writeLogEcho(true, "AutoSelect", "run Center Five Piece Shoot Edge");
 			autonomousCommandMain = new CenterFivePieceShootEdge(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == AmpFourPieceCenter){
+		else if(autoPlan == AutoSelectionOption.AmpFourPieceCenter.value){
 			log.writeLogEcho(true, "AutoSelect", "run Amp Four Piece Center");
 			autonomousCommandMain = new AmpThreePieceCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		
 		}	
 		
-		else if(autoPlan == AlternetSourceThreeNoteCenter){
+		else if(autoPlan == AutoSelectionOption.AlternetSourceThreeNoteCenter.value){
 			log.writeLogEcho(true, "AutoSelect", "run Alternet SourceThreeNoteCenter");
 			autonomousCommandMain = new AlternetSourceThreeNoteCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceFourNoteCenter){
+		else if(autoPlan == AutoSelectionOption.SourceFourNoteCenter.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Four Note Center");
 			autonomousCommandMain = new SourceFourNoteCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceFifthNote){
+		else if(autoPlan == AutoSelectionOption.SourceFifthNote.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source One Note Mobility");
 			autonomousCommandMain = new SourceOnePieceDriveToFifthNote(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceFifthNoteAndShoot){
+		else if(autoPlan == AutoSelectionOption.SourceFifthNoteAndShoot.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Two Notes With Fifth note");
 			autonomousCommandMain = new SourceTwoPieceFifthNoteShoot(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if(autoPlan == SourceWallMobilityAuto){
+		else if(autoPlan == AutoSelectionOption.SourceWallMobilityAuto.value){
 			log.writeLogEcho(true, "AutoSelect", "run Source Auto Into the Side");
 			autonomousCommandMain = new SourceWallMobilityAuto(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
 
-		else if (autoPlan == AmpThreePieceCenter) {
+		else if (autoPlan == AutoSelectionOption.AmpThreePieceCenter.value) {
 			log.writeLogEcho(true, "AutoSelect", "run Amp Three Piece");
 			autonomousCommandMain = new AmpThreePieceCenter(intake, wrist, shooter, driveTrain, feeder, robotState, trajectoryCache, allianceSelection, log);
 		}
