@@ -115,7 +115,7 @@ public class LED extends SubsystemBase {
    * Update strips for a countdown animation.
    * @param percent 0-1 progress through the countdown
    */
-  public void updateLEDsCountdown(double percent) {
+  private void updateLEDsCountdown(double percent) {
 
     double leftCount = LEDSegmentRange.StripLeft.count * percent;
     int ledCountLeft = (int) leftCount;
@@ -132,7 +132,7 @@ public class LED extends SubsystemBase {
    * @param color BCRColor to make LEDs (solid)
    * @param strip true = update strips, false = update CANdle
    */
-  public void updateLEDs(BCRColor color, boolean strip) {
+  private void updateLEDs(BCRColor color, boolean strip) {
     if (strip) {
       setLEDs(color, LEDSegmentRange.StripLeft);
       setLEDs(color, LEDSegmentRange.StripRight);
