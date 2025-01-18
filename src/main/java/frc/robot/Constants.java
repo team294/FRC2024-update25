@@ -494,9 +494,9 @@ public final class Constants {
       public enum LEDSegmentRange {
           // TODO test the changed ranges for the strips
           CANdle(0,8), // Whole CANdle
-          StripLeft(31,29),  // Left strip only
-          StripRight(60,29), // Right strip only
-          StripHorizontal(8,23); // Horizontal strip only
+          StripLeft(31, 30),  // Left strip only -- D5:  Updated for 2 less LEDs
+          StripRight(61, 30), // Right strip only -- D5:  Updated for 2 less LEDs
+          StripHorizontal(8, 24);
 
           public final int index, count;
           LEDSegmentRange(int index, int count) {

@@ -35,6 +35,7 @@ import frc.robot.commands.Autos.*;
 import frc.robot.commands.Sequences.*;
 import frc.robot.commands.ShooterSetVelocity.VelocityType;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.*;
 import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
@@ -419,6 +420,8 @@ public class RobotContainer {
 
     matchTimer.stop();
     SignalLogger.stop();
+
+    led.sendEvent(StripEvents.ROBOT_DISABLED);
   }
 
   /**
@@ -477,6 +480,8 @@ public class RobotContainer {
 
     matchTimer.reset();
     matchTimer.start();
+
+    led.sendEvent(StripEvents.IDLE);
   }
 
   /**

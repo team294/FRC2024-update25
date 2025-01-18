@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.ctre.phoenix.led.Animation;
 import com.ctre.phoenix.led.CANdle;
+import com.ctre.phoenix.led.RainbowAnimation;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -52,16 +53,18 @@ public class LED extends SubsystemBase {
     SHOOTER_WITHIN_TARGET_VELOCITY,
     RAINBOW,
     MATCH_COUNTDOWN,
-    IDLE
+    IDLE,
+    ROBOT_DISABLED
   }
 
   Map<StripEvents, Integer> prioritiesStripEvents = Map.of(
-    StripEvents.INTAKING, 0,
-    StripEvents.PIECE_PRESENT, 1,
-    StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY, 2,
-    StripEvents.RAINBOW, 3,
+    StripEvents.ROBOT_DISABLED, 0,
+    StripEvents.INTAKING, 1,
+    StripEvents.PIECE_PRESENT, 2,
+    StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY, 3,
     StripEvents.MATCH_COUNTDOWN, 4,
-    StripEvents.IDLE, 5
+    StripEvents.RAINBOW, 5,
+    StripEvents.IDLE, 6
   );
 
   /**
@@ -104,73 +107,24 @@ public class LED extends SubsystemBase {
     for (LEDSegmentRange segment : LEDSegmentRange.values()) {
       segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
     }
-  }
 
-  /**
-   * Creates the CANdle LED subsystem without requiring a Timer object.
-   * @param CANPort
-   * @param subsystemName
-   * @param log
-   */
-  public LED(int CANPort, String subsystemName, FileLog log, BCRRobotState robotState) {
-    this.subsystemName = subsystemName;
-    this.candle = new CANdle(CANPort, "");
-    this.segments = new HashMap<LEDSegmentRange, LEDSegment>();
-    this.log = log;
-    logRotationKey = log.allocateLogRotation();
-
-    // Create the LED segments
-    for (LEDSegmentRange segment : LEDSegmentRange.values()) {
-      segments.put(segment, new LEDSegment(segment.index, segment.count, LEDConstants.Patterns.noPatternAnimation));
-    }
+    sendEvent(StripEvents.IDLE);
   }
 
   /**
    * Update strips for a countdown animation.
    * @param percent 0-1 progress through the countdown
    */
-  // TODO test if this works, partially untested
   public void updateLEDsCountdown(double percent) {
-    // Generates segment pattern for the left vertical segment based on percent
-    Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
-    LEDSegment segmentLeft = segments.get(LEDSegmentRange.StripLeft);
-    for (int i = 0; i < segmentPatternLeft.length; i++) {
-      if (i >= (1.0 - percent) * segmentPatternLeft.length) {
-        segmentPatternLeft[i] = Color.kRed;
-      } else if (segmentLeft != null) {
-        Color[] frame = segmentLeft.getCurrentFrame();
-        segmentPatternLeft[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-      }
-    }
 
-    // Generates segment pattern for the right vertical segment based on percent
-    Color[] segmentPatternRight = new Color[LEDSegmentRange.StripRight.count];
-    LEDSegment segmentRight = segments.get(LEDSegmentRange.StripRight);
-    for (int i = 0; i < segmentPatternRight.length; i++) {
-      if (i < percent * segmentPatternRight.length) {
-        segmentPatternRight[i] = Color.kRed;
-      } else if (segmentRight != null) {
-        Color[] frame = segmentRight.getCurrentFrame();
-        segmentPatternRight[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-      }
-    }
+    double leftCount = LEDSegmentRange.StripLeft.count * percent;
+    int ledCountLeft = (int) leftCount;
 
-    // Generates segment pattern for the horizontal segment based on percent
-    Color[] segmentPatternHorizontal = new Color[LEDSegmentRange.StripHorizontal.count];
-    LEDSegment segmentHorizontal = segments.get(LEDSegmentRange.StripHorizontal);
-    for (int i = 0; i < segmentPatternHorizontal.length; i++) {
-      if (i < percent * segmentPatternHorizontal.length) {
-        segmentPatternHorizontal[i] = Color.kRed;
-      } else if (segmentHorizontal != null) {
-        Color[] frame = segmentHorizontal.getCurrentFrame();
-        segmentPatternHorizontal[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-      }
-    }
+    double rightCount = LEDSegmentRange.StripRight.count * percent;
+    int ledCountRight = (int) rightCount;
 
-    // Sets segment ranges based on generated patterns
-    setAnimation(segmentPatternLeft, LEDSegmentRange.StripLeft, true);
-    setAnimation(segmentPatternRight, LEDSegmentRange.StripRight, true);
-    setAnimation(segmentPatternHorizontal, LEDSegmentRange.StripHorizontal, true);
+    setLEDs(Color.kRed, LEDSegmentRange.StripLeft.index + LEDSegmentRange.StripLeft.count - ledCountLeft, ledCountLeft);
+    setLEDs(Color.kRed, LEDSegmentRange.StripRight.index, ledCountRight);
   }
 
   /**
@@ -229,15 +183,17 @@ public class LED extends SubsystemBase {
     // This prevents LED flashing between orange and white when there is a piece
     if (previousEventStrip == StripEvents.PIECE_PRESENT && event == StripEvents.IDLE) return;
 
+    if (previousEventStrip == StripEvents.ROBOT_DISABLED && (event == StripEvents.MATCH_COUNTDOWN || event == StripEvents.RAINBOW)) return;
+
     switch (event) {
       case MATCH_COUNTDOWN:
         // Percent of the way through the last 10 seconds of the match (125 seconds in)
-        // TODO change back to normal match time
-        double percent = Math.max(matchTimer.get() - 1, 0) / 10.0;
+        double percent = Math.max(matchTimer.get() - 125, 0) / 10.0;
         updateLEDsCountdown(percent);
         break;
       case RAINBOW:
-        // TODO why is there no update here?
+        RainbowAnimation anim = new RainbowAnimation(1, .7, LEDSegmentRange.StripHorizontal.count, false, LEDSegmentRange.StripHorizontal.index);
+        animate(anim);
         break;
       case SHOOTER_WITHIN_TARGET_VELOCITY:
         updateLEDs(BCRColor.SHOOTER_WITHIN_TARGET_VELOCITY, true);
@@ -249,6 +205,7 @@ public class LED extends SubsystemBase {
         updateLEDs(BCRColor.INTAKING, true);
         break;
       default:
+        clearAnimation();
         updateLEDs(BCRColor.IDLE, true);
         break;
     }
@@ -327,6 +284,10 @@ public class LED extends SubsystemBase {
     candle.setLEDs(r, g, b);
   }
 
+  public void setLEDs(Color color, int index, int count) {
+    candle.setLEDs((int) (color.red * 255), (int) (color.green * 255), (int) (color.blue) * 255, 0, index, count);
+  }
+
   /**
    * Sets LEDs using color and index value
    * @param color color to set
@@ -350,7 +311,6 @@ public class LED extends SubsystemBase {
     // only update every log rotation as opposed to every 20ms
     if(log.isMyLogRotation(logRotationKey)) { 
       // if there is a sticky fault, send sticky fault present event
-      // TODO revisit this to see if !lastStickyFaultPresentReading can be added
       if (RobotPreferences.isStickyFaultActive()) {
         sendEvent(CANdleEvents.STICKY_FAULT_PRESENT);
         lastStickyFaultPresentReading = true;
@@ -362,8 +322,7 @@ public class LED extends SubsystemBase {
       }
 
       // if in last 10 seconds of match, send match countdown event
-      // TODO change back to normal match time
-      if (matchTimer.get() > 1 && matchTimer.get() <= 11) {
+      if (matchTimer.get() > 125 && matchTimer.get() <= 135) {
         sendEvent(StripEvents.MATCH_COUNTDOWN);
       }
     }

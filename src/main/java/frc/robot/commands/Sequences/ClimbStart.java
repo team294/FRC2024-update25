@@ -4,13 +4,13 @@
 
 package frc.robot.commands.Sequences;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import frc.robot.Constants.LEDConstants.LEDSegmentRange;
 import frc.robot.Constants.WristConstants.WristAngle;
-import frc.robot.commands.CANdleRainbowAnimation;
 import frc.robot.commands.WristSetAngle;
 import frc.robot.subsystems.LED;
 import frc.robot.subsystems.Wrist;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.FileLog;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -27,7 +27,7 @@ public class ClimbStart extends ParallelCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new WristSetAngle(WristAngle.climbStart, wrist, log),
-      new CANdleRainbowAnimation(led, LEDSegmentRange.StripHorizontal)
+      new InstantCommand(() -> { led.sendEvent(StripEvents.RAINBOW); })
     );
   }
 }
