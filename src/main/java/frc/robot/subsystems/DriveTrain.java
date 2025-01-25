@@ -667,6 +667,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
           // Stores the last non-erroneous positions. -9999 indicates that the position should not be displayed due to there being no valid position found
           double lastUpdatedX = -9999; 
           double lastUpdatedY = -9999;
+          double lastUpdatedRot = -9999;
           boolean updatedVisionPos = false;
           try {
             EstimatedRobotPose camPose = result.get();
@@ -676,6 +677,7 @@ public class DriveTrain extends SubsystemBase implements Loggable {
                 // Add X and Y measurments if the best target is less than 3 meters away
                 lastUpdatedX = camPose.estimatedPose.toPose2d().getX();
                 lastUpdatedY = camPose.estimatedPose.toPose2d().getY();
+                lastUpdatedRot = camPose.estimatedPose.toPose2d().getRotation().getDegrees();
                 updatedVisionPos = true;
               }
             }
@@ -689,6 +691,9 @@ public class DriveTrain extends SubsystemBase implements Loggable {
             }
             if (lastUpdatedY != -9999) {
               SmartDashboard.putNumber("Vision Only Pos Y", lastUpdatedY);
+            }
+            if (lastUpdatedRot != -9999){
+              SmartDashboard.putNumber("Vision only rotation", lastUpdatedRot);
             }
             SmartDashboard.putBoolean("Vision Only Pos Updated", updatedVisionPos);
           }
