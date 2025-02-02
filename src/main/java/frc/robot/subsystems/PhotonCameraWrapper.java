@@ -61,7 +61,7 @@ public class PhotonCameraWrapper extends SubsystemBase {
     //  aprilTagFieldLayout = field.getAprilTagFieldLayout();
 
     try {
-      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
       currAlliance = allianceSelection.getAlliance();
       switch (currAlliance) {
         case Blue:
