@@ -65,7 +65,7 @@ public class Field {
      * @param position the Pose2d position to be flipped
      * @return the flipped Pose2d
      */
-    public Pose2d flipPosition(Pose2d position) {
+    public static Pose2d flipPosition(Pose2d position) {
         return new Pose2d(Math.abs(Constants.FieldConstants.length - position.getX()), Math.abs(Constants.FieldConstants.width - position.getY()), position.getRotation().rotateBy(new Rotation2d(Math.PI)));
     }
 
@@ -97,7 +97,8 @@ public class Field {
         Pose2d nearestPos = currPos.nearest(new ArrayList<Pose2d>(ReefScoringPositions.values()));
         Pose2d nearestPosWithOffset = nearestPos.transformBy(offset);
         log.writeLogEcho(false, "Field", "getNearestReefScoringPositionWithOffset", currPos, nearestPos, offset, nearestPosWithOffset);
-        return (allianceSelection.getAlliance() == Alliance.Blue) ? nearestPosWithOffset : flipPosition(nearestPosWithOffset);
+        //return (allianceSelection.getAlliance() == Alliance.Blue) ? nearestPosWithOffset : flipPosition(nearestPosWithOffset);
+        return nearestPosWithOffset; //24-25 Coordinate system had 0,0 at the corner to the right of alliance drivers, rather than just at the right of the blue driver's corner
     };
 
 }

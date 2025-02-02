@@ -1,0 +1,58 @@
+[
+  {
+    "name": "/Preferences/Drive.offsetAngleFrontLeftMotor",
+    "type": "double",
+    "value": 110.7,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/Drive.offsetAngleFrontRightMotor",
+    "type": "double",
+    "value": 44.6,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/Drive.offsetAngleBackLeftMotor",
+    "type": "double",
+    "value": -67.1,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/Drive.offsetAngleBackRightMotor",
+    "type": "double",
+    "value": 152.1,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/Wrist.offsetAngleWrist",
+    "type": "double",
+    "value": 150.5,
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/problemSubsystem",
+    "type": "string",
+    "value": "Wrist-Not-calibrated-when-enabled",
+    "properties": {
+      "persistent": true
+    }
+  },
+  {
+    "name": "/Preferences/problemExists",
+    "type": "boolean",
+    "value": true,
+    "properties": {
+      "persistent": true
+    }
+  }
+]

@@ -153,6 +153,7 @@ public class RobotContainer {
     SmartDashboard.putData("Intake Piece", new IntakePiece(intake, feeder, wrist, shooter, robotState, log));
     SmartDashboard.putData("Shoot Piece", new ShootPiece(ShooterConstants.shooterVelocityTop, ShooterConstants.shooterVelocityBottom, true, shooter, feeder, wrist, robotState, log));
     SmartDashboard.putData("Stop All", new StopIntakeFeederShooter(intake, shooter, feeder, robotState, log));
+    SmartDashboard.putData("Drive to Closest Reef Position", new DriveToClosestReefPosition(driveTrain, field, log));
 
     // Autos
     SmartDashboard.putData("Amp Two Piece Shoot", new AmpTwoPieceShoot(intake, shooter, driveTrain, feeder, wrist, robotState, trajectoryCache, allianceSelection, log));
