@@ -4,60 +4,21 @@
 
 package frc.robot.utilities;
 
-import edu.wpi.first.apriltag.AprilTag;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Constants;
 
-/**
- * A class representing field coordinates.
- * <p> Field coordinates include:
- * <p> Robot X location in the field, in meters (0 = field edge in front of driver station, + = away from our drivestation)
- * <p> Robot Y location in the field, in meters (0 = right edge of field when standing in driver station, + = left when looking from our drivestation)
- * <p> Robot angle on the field (0 = facing away from our drivestation, + to the left, - to the right)
- */
+/** Add your docs here. */
 public class Field {
-    //Robot probably 31" with bumpers
-    private final Rotation2d oneEighty = new Rotation2d(Math.PI);
-    private final Rotation2d zero = new Rotation2d(0.0);
-    private final Rotation2d twoSeventy = new Rotation2d(Math.PI*1.5);
-    private final Rotation2d oneTwenty = new Rotation2d(Math.PI*(2/3));
-    private final Rotation2d twoForty = new Rotation2d(Math.PI*(4/3));
-    private final Rotation2d sixty = new Rotation2d(Math.PI/3);
-    private final Rotation2d threeHundred = new Rotation2d(Math.PI*(5/3));
 
-    // BLUE  
-    //IDs 1 and 2 are loading zone
-    //ID 3 is amp
-    //IDs 4 and 5 are speaker
-    //IDs 6 - 8 are stage
-    
-    // RED
-    //IDs 9 and 10 are loading zone
-    //ID 11 is amp
-    //IDs 12 and 13 are speaker
-    //IDs 14 - 16 are stage
-    private final AprilTag[] AprilTags = {
-        new AprilTag(1, new Pose3d(new Pose2d(15.0794638570895, 0.245871867229192, oneTwenty))),      // 120 degrees
-        new AprilTag(2, new Pose3d(new Pose2d(16.1851252600324, 0.883665522820618, oneTwenty))),      // 120 degrees
-        new AprilTag(3, new Pose3d(new Pose2d(1.84149900559054, 8.20419556973439, twoSeventy))),      // 270 degrees
-        new AprilTag(4, new Pose3d(new Pose2d(-0.0380999794260111, 5.5478650041529, zero))),            // 0 degrees
-        new AprilTag(5, new Pose3d(new Pose2d(-0.0380999794260111, 4.98271530933373, zero))),           // 0 degrees
-        new AprilTag(6, new Pose3d(new Pose2d(5.32078912677387, 4.10514578322128, zero))),            // 0 degrees
-        new AprilTag(7, new Pose3d(new Pose2d(4.64133949367667, 4.49833757089771, oneTwenty))),       // 120 degrees
-        new AprilTag(8, new Pose3d(new Pose2d(4.64133949367667, 3.71322399485904, twoForty))),        // 240 degrees
-        new AprilTag(9, new Pose3d(new Pose2d(0.356107807701784, 0.883665522820618, sixty))),         // 60 degrees
-        new AprilTag(10, new Pose3d(new Pose2d(1.46151521078179, 0.245871867229192, sixty))),         // 60 degrees
-        new AprilTag(11, new Pose3d(new Pose2d(14.700750061595, 8.20419556973439, twoSeventy))),      // 270 degrees
-        new AprilTag(12, new Pose3d(new Pose2d(16.5793330471602, 4.98271530933373, oneEighty))),      // 180 degrees
-        new AprilTag(13, new Pose3d(new Pose2d(16.5793330471602, 5.5478650041529, oneEighty))),       // 180 degrees
-        new AprilTag(14, new Pose3d(new Pose2d(11.9047195714514, 3.71322399485904, threeHundred))),   // 300 degrees
-        new AprilTag(15, new Pose3d(new Pose2d(11.9047195714514, 4.49833757089771, sixty))),          // 60 degrees
-        new AprilTag(16, new Pose3d(new Pose2d(11.2201899410974, 4.10514578322128, oneEighty)))       // 180 degrees
-    };
-
-    private final AllianceSelection alliance;
+    private HashMap<String, Pose2d> ReefScoringPositions;
+    private AllianceSelection allianceSelection;
     private final FileLog log;
 
     /**
@@ -69,48 +30,74 @@ public class Field {
      * <p> Robot angle on the field (0 = facing away from our drivestation, + to the left, - to the right)
      * @param alliance Alliance object to provide the currently selected alliance
      */
-    public Field(AllianceSelection alliance, FileLog log){
-        this.alliance = alliance;
+    public Field(AllianceSelection allianceSelection, FileLog log){
+        this.ReefScoringPositions = new HashMap<String, Pose2d>(12);
+        this.allianceSelection = allianceSelection;
         this.log = log;
 
-        this.log.writeLogEcho(true, "Field", "Constructor", "Alliance", alliance.toString());
-    }
+        //Reef Scoring Positions, points are on the walls of the reef (Positions are relative, with the origin being the corner to the driver's right)
+        //0 is the closest left scoring position to the drivers, following positions moving clockwise
+        //Angles represent the direction the robot would be facing (if scoring mechanism is on the front) when scoring at that point
+        //
+        //Drivers | Field     K  J
+        //        |         L      I
+        //        |       A          H
+        //        |       B          G
+        //        |         C      F
+        //        |           D  E
+        //(Rotation of 0 faces away from drivers)
+        ReefScoringPositions.put("A", new Pose2d(Units.inchesToMeters(144.0),         Units.inchesToMeters(166.006493),     new Rotation2d(0)        ));
+        ReefScoringPositions.put("B", new Pose2d(Units.inchesToMeters(144.0),         Units.inchesToMeters(153.292837),     new Rotation2d(0)        ));
+        ReefScoringPositions.put("C", new Pose2d(Units.inchesToMeters(154.867597965), Units.inchesToMeters(134.469605169),  new Rotation2d(Math.PI/3)      ));
+        ReefScoringPositions.put("D", new Pose2d(Units.inchesToMeters(165.877947035), Units.inchesToMeters(128.112777169),  new Rotation2d(Math.PI/3)      ));
+        ReefScoringPositions.put("E", new Pose2d(Units.inchesToMeters(187.613142965), Units.inchesToMeters(128.112777169),  new Rotation2d(Math.PI*(2/3))  ));
+        ReefScoringPositions.put("F", new Pose2d(Units.inchesToMeters(198.623492035), Units.inchesToMeters(134.469605169),  new Rotation2d(Math.PI*(2/3))  ));
+        ReefScoringPositions.put("G", new Pose2d(Units.inchesToMeters(209.49109),     Units.inchesToMeters(153.292837),     new Rotation2d(Math.PI)        ));
+        ReefScoringPositions.put("H", new Pose2d(Units.inchesToMeters(209.49109),     Units.inchesToMeters(166.006493),     new Rotation2d(Math.PI)        ));
+        ReefScoringPositions.put("I", new Pose2d(Units.inchesToMeters(198.623492035), Units.inchesToMeters(184.829724831),  new Rotation2d(-Math.PI*(2/3)) ));
+        ReefScoringPositions.put("J", new Pose2d(Units.inchesToMeters(187.613142965), Units.inchesToMeters(191.186552831),  new Rotation2d(-Math.PI*(2/3)) ));
+        ReefScoringPositions.put("K", new Pose2d(Units.inchesToMeters(165.877947035), Units.inchesToMeters(191.186552831),  new Rotation2d(-Math.PI/3)     ));
+        ReefScoringPositions.put("L", new Pose2d(Units.inchesToMeters(154.867597965), Units.inchesToMeters(184.829724831),  new Rotation2d(-Math.PI/3)     ));
+    };
 
     /**
-	 * Gets the position of a specified April Tag (1-8)
-     * <p> Note that the position will be different for red vs blue alliance, based on the current alliance in the alliance object.
-	 * 
-	 * @param position
-	 */
-    public AprilTag getAprilTag(int ID) throws IndexOutOfBoundsException {
-        if(ID < 17 && ID > 0) {
-            if(alliance.getAlliance() == Alliance.Blue) {
-                return AprilTags[ID-1];
-            } else {
-                return AprilTags[ID-1];
-            }
-        } else {
-            throw new IndexOutOfBoundsException(String.format("AprilTag ID %d out of range", ID));
-        }
-    }
-
-    /**
-     * gets alliance
-     * @return Alliance current selected alliance color
+     * Flips the x, y, and rotation coordinates across the field, converting between field positions for the red and blue alliances
+     * @param position the Pose2d position to be flipped
+     * @return the flipped Pose2d
      */
-    public Alliance getAlliance() {
-        return alliance.getAlliance();
+    public Pose2d flipPosition(Pose2d position) {
+        return new Pose2d(Math.abs(Constants.FieldConstants.length - position.getX()), Math.abs(Constants.FieldConstants.width - position.getY()), position.getRotation().rotateBy(new Rotation2d(Math.PI)));
     }
 
     /**
-     * Need to check if april tag values match april tag on or to the side of the speaker
-     * @return Speaker Pose2d Value
+     * Gets the Pose2d of the given scoring position
+     * @param position letter value associated with one of the 12 scoring positions (A-K starting at the upper 9 o'clock position and moving CCW)
+     * @return Pose2d or one of the scoring positions (against the base)
      */
-    public Pose2d getSpeakerPose2d(){
-        if(getAlliance() == Alliance.Blue){
-            return getAprilTag(4).pose.toPose2d();
-        } else {
-            return getAprilTag(12).pose.toPose2d();
-        }
+    public Pose2d getReefScoringPosition(String position) {
+        return ReefScoringPositions.get(position);
     }
+
+    /**
+     * Finds and returns the nearest reef scoring position (against the base)
+     * @param currPos the robot's current positions
+     * @return The Pose2d of the nearest scoring position
+     */
+    public Pose2d getNearestReefScoringPosition(Pose2d currPos) {
+        return getNearestReefScoringPositionWithOffset(currPos, new Transform2d(0, 0, new Rotation2d(0)));
+    };
+
+    /**
+     * Finds and returns the nearest reef scoring position (against the base) with an offset
+     * @param currPos the robot's current positions
+     * @param offset the offset by which the returned pose2d is tranformed
+     * @return The Pose2d of the nearest scoring position
+     */
+    public Pose2d getNearestReefScoringPositionWithOffset(Pose2d currPos, Transform2d offset) {
+        Pose2d nearestPos = currPos.nearest(new ArrayList<Pose2d>(ReefScoringPositions.values()));
+        Pose2d nearestPosWithOffset = nearestPos.transformBy(offset);
+        log.writeLogEcho(false, "Field", "getNearestReefScoringPositionWithOffset", currPos, nearestPos, offset, nearestPosWithOffset);
+        return (allianceSelection.getAlliance() == Alliance.Blue) ? nearestPosWithOffset : flipPosition(nearestPosWithOffset);
+    };
+
 }
