@@ -117,6 +117,8 @@ public final class Constants {
 
       // Width of robot in meters
       public static final double robotWidth = 0.9144;
+      // Diagonal Width of robot in meters
+      public static final double robotDiagonal = Math.sqrt(2)*robotWidth;
     }
 
     public static final class SwerveConstants {
