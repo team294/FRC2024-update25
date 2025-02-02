@@ -25,6 +25,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 public class PhotonCameraWrapper extends SubsystemBase {
   public PhotonCamera photonCamera;
+  public PhotonCamera photonCamera2;
   public PhotonPoseEstimator photonPoseEstimator;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private FileLog log;
@@ -57,15 +58,18 @@ public class PhotonCameraWrapper extends SubsystemBase {
       photonCamera = new PhotonCamera(PhotonVisionConstants.aprilTagCameraName);
     }
 
+    if (photonCamera2 == null){
+      photonCamera2 = new PhotonCamera(PhotonVisionConstants.aprilTagCameraBackName);
+    }
 
     //  aprilTagFieldLayout = field.getAprilTagFieldLayout();
 
     try {
-      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2024Crescendo.m_resourceFile);
+      aprilTagFieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2025Reefscape.m_resourceFile);
       currAlliance = allianceSelection.getAlliance();
       switch (currAlliance) {
         case Blue:
-          aprilTagFieldLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
+          aprilTagFieldLayout.setOrigin(OriginPosition.kBlueAllianceWallRightSide);         // note: we can remove the logic for the red side if we are going to do blue only odometry
           break;
         case Red:
           aprilTagFieldLayout.setOrigin(OriginPosition.kRedAllianceWallRightSide);
@@ -116,9 +120,14 @@ public class PhotonCameraWrapper extends SubsystemBase {
      *
      * @return The best target of the pipeline result.
      */
-  PhotonPipelineResult getLatestResult() {
+  PhotonPipelineResult getLatestResultCamera1() {
     List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
     return results.isEmpty() ? null : results.get(results.size()-1);
+  }
+
+  PhotonPipelineResult getLatestResultCamera2(){
+    List<PhotonPipelineResult> results = photonCamera2.getAllUnreadResults();
+    return results.isEmpty() ? null : results.get(results.size() - 1);
   }
 
   /**
