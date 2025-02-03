@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
+import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -12,6 +13,7 @@ import frc.robot.utilities.AllianceSelection;
 import frc.robot.utilities.FileLog;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +28,8 @@ import org.photonvision.targeting.PhotonPipelineResult;
 public class PhotonCameraWrapper extends SubsystemBase {
   public PhotonCamera photonCamera;
   public PhotonCamera photonCamera2;
-  public PhotonPoseEstimator photonPoseEstimator;
+  public PhotonPoseEstimator photonPoseEstimatorCamera1;
+  public PhotonPoseEstimator photonPoseEstimatorCamera2;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private FileLog log;
   private boolean hasInit = false;
@@ -34,6 +37,15 @@ public class PhotonCameraWrapper extends SubsystemBase {
   private AllianceSelection allianceSelection;
   private int logRotationKey;
   private boolean fastLogging = false;
+  
+  public enum Cameras{
+    backCamera(PhotonVisionConstants.aprilTagCameraName),
+    frontCamera(PhotonVisionConstants.aprilTagCameraBackName);
+
+    @SuppressWarnings({"MemberName", "PMD.SingularField"})
+    public final String cameraName;
+    Cameras(String cameraName){ this.cameraName = cameraName; }
+  }
 
   public PhotonCameraWrapper(AllianceSelection allianceSelection, FileLog log, int logRotationKey) {
     this.log = log;
@@ -85,10 +97,15 @@ public class PhotonCameraWrapper extends SubsystemBase {
     }
     
     // Create pose estimator
-    photonPoseEstimator = new PhotonPoseEstimator(
+    photonPoseEstimatorCamera1 = new PhotonPoseEstimator(
       aprilTagFieldLayout,
       PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
       PhotonVisionConstants.robotToCamBack);
+
+    photonPoseEstimatorCamera2 = new PhotonPoseEstimator(
+      aprilTagFieldLayout,
+      PoseStrategy.CLOSEST_TO_REFERENCE_POSE,
+      PhotonVisionConstants.robotToCamFront);
       
     hasInit = true;
 
@@ -114,20 +131,40 @@ public class PhotonCameraWrapper extends SubsystemBase {
     }
   }
 
+ 
+
   /**
-     * Returns the best target in this pipeline result. If there are no new targets, this method will
+   * Returns a list of the best targets in the camera pipelines with its corresponding cameras. If there is no new targets, the cameras element will return null
+   * 
+   * @return A list of the cameras best targets
+   */
+  List<Pair<PhotonPipelineResult, Cameras>> getLatestCameraResults(){
+    List<Pair<PhotonPipelineResult, Cameras>> results = new ArrayList<Pair<PhotonPipelineResult, Cameras>>();
+    results.add(getLatestResultCamera1());
+    results.add(getLatestResultCamera2());
+    return results;
+  }
+
+   /**
+     * Returns a pair with the best target in Camera 1 Pipeline result and the Camera enum. If there are no new targets, this method will
      * return null. The best target is determined by the target sort mode in the PhotonVision UI.
      *
      * @return The best target of the pipeline result.
      */
-  PhotonPipelineResult getLatestResultCamera1() {
+  Pair<PhotonPipelineResult, Cameras> getLatestResultCamera1() {
     List<PhotonPipelineResult> results = photonCamera.getAllUnreadResults();
-    return results.isEmpty() ? null : results.get(results.size()-1);
+    return results.isEmpty() ? null : new Pair<PhotonPipelineResult, Cameras> (results.get(results.size()-1), Cameras.backCamera);
   }
 
-  PhotonPipelineResult getLatestResultCamera2(){
+   /**
+     * Returns a pair with the best target in Camera 2 Pipeline result and the Camera enum. If there are no new targets, this method will
+     * return null. The best target is determined by the target sort mode in the PhotonVision UI.
+     *
+     * @return The best target of the pipeline result.
+     */
+  Pair<PhotonPipelineResult, Cameras> getLatestResultCamera2(){
     List<PhotonPipelineResult> results = photonCamera2.getAllUnreadResults();
-    return results.isEmpty() ? null : results.get(results.size() - 1);
+    return results.isEmpty() ? null : new Pair<PhotonPipelineResult, Cameras>(results.get(results.size() - 1), Cameras.frontCamera);
   }
 
   /**
@@ -137,20 +174,43 @@ public class PhotonCameraWrapper extends SubsystemBase {
   *         of the observation. Assumes a planar field and the robot is always
   *         firmly on the ground
   */
-  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose, PhotonPipelineResult latestResult) {
-    photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-    var newPoseOptional = photonPoseEstimator.update(latestResult);
-    if (newPoseOptional.isPresent()) {
-      EstimatedRobotPose newPose = newPoseOptional.get();
-      if(fastLogging || log.isMyLogRotation(logRotationKey)) {
-        log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", true, "X",newPose.estimatedPose.getX(),"Y",newPose.estimatedPose.getY());
-        SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
-      }
-    } else {
-      if(fastLogging || log.isMyLogRotation(logRotationKey)) {
-        log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", false, "X", 0, "Y", 0);
-        SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
-      }
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose(Pose2d prevEstimatedRobotPose, PhotonPipelineResult latestResult, Cameras cameraName) {
+    Optional<EstimatedRobotPose> newPoseOptional;
+    switch(cameraName){
+      case backCamera:
+        photonPoseEstimatorCamera1.setReferencePose(prevEstimatedRobotPose);
+        newPoseOptional = photonPoseEstimatorCamera1.update(latestResult);
+        if (newPoseOptional.isPresent()) {
+          EstimatedRobotPose newPose = newPoseOptional.get();
+          if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+            log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", true, "X",newPose.estimatedPose.getX(),"Y",newPose.estimatedPose.getY());
+            SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+          }
+        } else {
+          if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+            log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", false, "X", 0, "Y", 0);
+            SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+          }
+        }
+      break;
+      case frontCamera:
+        photonPoseEstimatorCamera2.setReferencePose(prevEstimatedRobotPose);
+        newPoseOptional = photonPoseEstimatorCamera1.update(latestResult);
+        if (newPoseOptional.isPresent()) {
+          EstimatedRobotPose newPose = newPoseOptional.get();
+          if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+            log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", true, "X",newPose.estimatedPose.getX(),"Y",newPose.estimatedPose.getY());
+            SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+          }
+        } else {
+          if(fastLogging || log.isMyLogRotation(logRotationKey)) {
+            log.writeLog(false, "PhotonCameraWrapper", "getEstimatedGlobalPose", "IsConnected", photonCamera.isConnected(), "TagPresent", false, "X", 0, "Y", 0);
+            SmartDashboard.putBoolean("PhotonVision Connected", photonCamera.isConnected());
+          }
+        }
+      break;
+      default:
+        newPoseOptional = Optional.empty();
     }
     return newPoseOptional;
   }
