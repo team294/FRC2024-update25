@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -42,7 +45,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.robotInit();
 
     for (TalonFX motor : songMotors) {
-      orchestra.addInstrument(motor, 0);
+      m_orchestra.addInstrument(motor, 0);
     }
   }
 
@@ -68,7 +71,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     m_robotContainer.disabledInit();
     
-    orchestra.stop();
+    m_orchestra.stop();
   }
 
   @Override
@@ -105,7 +108,7 @@ public class Robot extends TimedRobot {
     }
     m_robotContainer.teleopInit();
 
-    orchestra.play();
+    m_orchestra.play();
   }
 
   /** This function is called periodically during operator control. */
