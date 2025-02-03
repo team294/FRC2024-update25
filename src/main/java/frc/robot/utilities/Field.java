@@ -98,7 +98,7 @@ public class Field {
         Pose2d nearestPosWithOffset = nearestPos.transformBy(offset);
         log.writeLogEcho(false, "Field", "getNearestReefScoringPositionWithOffset", currPos, nearestPos, offset, nearestPosWithOffset);
         //return (allianceSelection.getAlliance() == Alliance.Blue) ? nearestPosWithOffset : flipPosition(nearestPosWithOffset);
-        return nearestPosWithOffset; //24-25 Coordinate system had 0,0 at the corner to the right of alliance drivers, rather than just at the right of the blue driver's corner
+        return nearestPosWithOffset; //24-25 Coordinate system has 0,0 at the right corner of either alliance drivers, rather than just at the right corner of the blue driver
     };
 
 }
