@@ -321,10 +321,11 @@ public class LED extends SubsystemBase {
         lastStickyFaultPresentReading = false;
       }
 
+      // commented so the leds dont turn red during outreach
       // if in last 10 seconds of match, send match countdown event
-      if (matchTimer.get() > 125 && matchTimer.get() <= 135) {
-        sendEvent(StripEvents.MATCH_COUNTDOWN);
-      }
+      // if (matchTimer.get() > 125 && matchTimer.get() <= 135) {
+      //   sendEvent(StripEvents.MATCH_COUNTDOWN);
+      // }
     }
   }
 }
