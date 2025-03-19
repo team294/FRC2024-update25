@@ -87,8 +87,8 @@ public class RobotContainer {
     configureShuffleboard();
 
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
-    driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
-
+    // driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
+    driveTrain.setDefaultCommand(new DriveWithController(driveTrain, xboxController, allianceSelection, log));
   }
 
   /**
