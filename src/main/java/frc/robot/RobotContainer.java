@@ -295,9 +295,9 @@ public class RobotContainer {
     }
 
     // Auto Drive to Amp
-    left[1].whileTrue(
-      new DriveToAmp(allianceSelection, intake, feeder, wrist, driveTrain, robotState, log)
-    );
+    // left[1].whileTrue(
+    //   new DriveToAmp(allianceSelection, intake, feeder, wrist, driveTrain, robotState, log)
+    // );
 
     // Shoot the note
     left[2].onTrue(
@@ -305,40 +305,40 @@ public class RobotContainer {
     );
 
     // Right button 1:  Aim lock on speaker or midfield pass depending on location of robot on button press
-    right[1].whileTrue(
-      either(
-        // Aim lock on speaker
-        parallel(
-          new SetAimLock(driveTrain, true, log),
-          new ShotModeSet(ShotMode.SPEAKER, robotState, log),
-          new WristSetAngleWithVision(wrist, allianceSelection, driveTrain, log),
-          new ShooterSetVelocity(ShooterConstants.shooterVelocityTop, ShooterConstants.shooterVelocityBottom, VelocityType.waitForVelocity, shooter, log).withTimeout(1.5)
-        ),
-        // Aim lock on midfield pass
-        parallel(
-          new SetAimLock(driveTrain, true, log),
-          new SetShooterFarShot(WristAngle.longPassAngle, 
-        ShooterConstants.shooterVelocityFarPassTop, ShooterConstants.shooterVelocityFarPassBottom, 
-        shooter, wrist, intake, feeder, ShotMode.VISION_MID_PASS, robotState, log)
-        ),
-        () -> driveTrain.getPose().getX() < FieldConstants.xThresholdMidPass
-      )
+    // right[1].whileTrue(
+    //   either(
+    //     // Aim lock on speaker
+    //     parallel(
+    //       new SetAimLock(driveTrain, true, log),
+    //       new ShotModeSet(ShotMode.SPEAKER, robotState, log),
+    //       new WristSetAngleWithVision(wrist, allianceSelection, driveTrain, log),
+    //       new ShooterSetVelocity(ShooterConstants.shooterVelocityTop, ShooterConstants.shooterVelocityBottom, VelocityType.waitForVelocity, shooter, log).withTimeout(1.5)
+    //     ),
+    //     // Aim lock on midfield pass
+    //     parallel(
+    //       new SetAimLock(driveTrain, true, log),
+    //       new SetShooterFarShot(WristAngle.longPassAngle, 
+    //     ShooterConstants.shooterVelocityFarPassTop, ShooterConstants.shooterVelocityFarPassBottom, 
+    //     shooter, wrist, intake, feeder, ShotMode.VISION_MID_PASS, robotState, log)
+    //     ),
+    //     () -> driveTrain.getPose().getX() < FieldConstants.xThresholdMidPass
+    //   )
       
-    );
-    right[1].onFalse(
-      new SetAimLock(driveTrain, false, log)
-    );
+    // );
+    // right[1].onFalse(
+    //   new SetAimLock(driveTrain, false, log)
+    // );
 
-    // Right button 2:  Aim lock on far pass target
-    right[2].whileTrue(new ParallelCommandGroup(
-      new SetAimLock(driveTrain, true, log),
-      new SetShooterFarShot(WristAngle.longPassAngle, 
-        ShooterConstants.shooterVelocityFarPassTop, ShooterConstants.shooterVelocityFarPassBottom, 
-        shooter, wrist, intake, feeder, ShotMode.VISION_FAR_PASS, robotState, log)
-    ));
-    right[2].onFalse(
-      new SetAimLock(driveTrain, false, log)
-    );
+    // // Right button 2:  Aim lock on far pass target
+    // right[2].whileTrue(new ParallelCommandGroup(
+    //   new SetAimLock(driveTrain, true, log),
+    //   new SetShooterFarShot(WristAngle.longPassAngle, 
+    //     ShooterConstants.shooterVelocityFarPassTop, ShooterConstants.shooterVelocityFarPassBottom, 
+    //     shooter, wrist, intake, feeder, ShotMode.VISION_FAR_PASS, robotState, log)
+    // ));
+    // right[2].onFalse(
+    //   new SetAimLock(driveTrain, false, log)
+    // );
   }
 
   /**
