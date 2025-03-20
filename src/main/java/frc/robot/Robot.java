@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.Orchestra;
+import com.ctre.phoenix6.hardware.TalonFX;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -19,6 +22,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+
+  private Orchestra m_orchestra = new Orchestra("lostWoods.chrp");
+  TalonFX[] songMotors = {new TalonFX(1, "rio"), new TalonFX(2, "rio"), new TalonFX(3, "rio"), new TalonFX(4, "rio"), new TalonFX(5, "rio"), new TalonFX(6, "rio"), new TalonFX(7, "rio"), new TalonFX(8, "rio"), new TalonFX(13, "rio"), new TalonFX(14, "rio"), new TalonFX(15, "rio"), new TalonFX(16, "rio")};
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -37,6 +43,10 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
     m_robotContainer.robotInit();
+
+    for (TalonFX motor : songMotors) {
+      m_orchestra.addInstrument(motor, 0);
+    }
   }
 
   /**
@@ -60,6 +70,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.disabledInit();
+    
+    m_orchestra.stop();
   }
 
   @Override
@@ -95,6 +107,8 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.teleopInit();
+
+    m_orchestra.play();
   }
 
   /** This function is called periodically during operator control. */
