@@ -25,13 +25,14 @@ import frc.robot.Constants.*;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
-
+import frc.robot.subsystems.LED.StripEvents;
 
 public class Shooter extends SubsystemBase implements Loggable {
   private final FileLog log;
   private boolean fastLogging = false;
   private int logRotationKey;
   private final String subsystemName;
+  private final LED led;
 
   // Create Kraken for top shooter motor
   private final TalonFX shooterTop = new TalonFX(Ports.CANShooterTop);
@@ -67,15 +68,17 @@ public class Shooter extends SubsystemBase implements Loggable {
   private boolean velocityControlOn = false;
   private double setpointRPMTop;
   private double setpointRPMBottom;
-  
+  private boolean lastShooterVelocityWithinErrorReading;
+
   /**
    * Create the shooter subsystem
    * @param log
    */
-  public Shooter(FileLog log) {
+  public Shooter(FileLog log, LED led) {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Shooter";
+    this.led = led;
 
     // Configure top shooter motor
     shooterTopConfigurator = shooterTop.getConfigurator();
@@ -304,8 +307,18 @@ public class Shooter extends SubsystemBase implements Loggable {
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom RPM"), getBottomShooterVelocity());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
-      
-    }
+
+      // Are we at the right velocity to shoot?
+      if ((isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && !lastShooterVelocityWithinErrorReading) {
+        led.sendEvent(StripEvents.SHOOTER_WITHIN_TARGET_VELOCITY);
+        lastShooterVelocityWithinErrorReading = true;
+      }
+
+      if (!(isVelocityControlOn() && Math.abs(getTopShooterVelocityPIDError()) < ShooterConstants.velocityErrorTolerance) && lastShooterVelocityWithinErrorReading) {
+        led.sendEvent(StripEvents.IDLE);
+        lastShooterVelocityWithinErrorReading = false;
+      }
+   }
   }
 
   /**

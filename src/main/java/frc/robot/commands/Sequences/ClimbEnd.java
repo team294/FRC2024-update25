@@ -4,15 +4,15 @@
 
 package frc.robot.commands.Sequences;
 
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.WristConstants;
-import frc.robot.Constants.LEDConstants.LEDSegmentRange;
 import frc.robot.Constants.WristConstants.WristAngle;
-import frc.robot.commands.CANdleRainbowAnimation;
 import frc.robot.commands.WristSetAngle;
 import frc.robot.commands.WristSetPercentOutput;
 import frc.robot.subsystems.LED;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.subsystems.Wrist;
 import frc.robot.utilities.FileLog;
 
@@ -29,7 +29,7 @@ public class ClimbEnd extends ParallelCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new CANdleRainbowAnimation(led, LEDSegmentRange.StripHorizontal),
+      new InstantCommand(() -> { led.sendEvent(StripEvents.RAINBOW); }),
       new SequentialCommandGroup(
         new WristSetPercentOutput(WristConstants.climbPercentOutput, wrist, log).until(() -> (wrist.getWristAngle() <= WristAngle.climbStop.value + 5.0)),
         new WristSetAngle(WristAngle.climbStop, wrist, log)

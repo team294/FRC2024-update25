@@ -35,6 +35,7 @@ import frc.robot.commands.Autos.*;
 import frc.robot.commands.Sequences.*;
 import frc.robot.commands.ShooterSetVelocity.VelocityType;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.*;
 import frc.robot.utilities.BCRRobotState.ShotMode;
 import frc.robot.utilities.BCRRobotState.State;
@@ -51,20 +52,23 @@ public class RobotContainer {
   private final AllianceSelection allianceSelection = new AllianceSelection(log);
   private final Timer matchTimer = new Timer();
 
+  // Need to define this before LED because LED uses it
+  private final BCRRobotState robotState = new BCRRobotState();
+  
+  // Is a subsystem, but requires a utility
+  private final LED led = new LED(Constants.Ports.CANdle1, "LED", matchTimer, log, robotState);
+  
   // Define robot subsystems  
   private final DriveTrain driveTrain = new DriveTrain(allianceSelection, log);
-  private final Intake intake = new Intake("Intake", log);
-  private final Shooter shooter = new Shooter(log);
-  private final Feeder feeder = new Feeder(log);
-  private final Wrist wrist = new Wrist(log);
+  private final Intake intake = new Intake("Intake", led, log);
+  private final Shooter shooter = new Shooter(log, led);
+  private final Feeder feeder = new Feeder(log, led);
+  private final Wrist wrist = new Wrist(log, led);
 
   // Define other utilities
   private final TrajectoryCache trajectoryCache = new TrajectoryCache(log);
   private final AutoSelection autoSelection = new AutoSelection(trajectoryCache, allianceSelection, log);
-  private final BCRRobotState robotState = new BCRRobotState();
   
-  // Is a subsystem, but requires a utility
-  private final LED led = new LED(Constants.Ports.CANdle1, "LED", shooter, feeder, robotState, matchTimer, wrist, log);
 
 
   // Define controllers
@@ -416,6 +420,8 @@ public class RobotContainer {
 
     matchTimer.stop();
     SignalLogger.stop();
+
+    led.sendEvent(StripEvents.ROBOT_DISABLED);
   }
 
   /**
@@ -474,6 +480,8 @@ public class RobotContainer {
 
     matchTimer.reset();
     matchTimer.start();
+
+    led.sendEvent(StripEvents.IDLE);
   }
 
   /**

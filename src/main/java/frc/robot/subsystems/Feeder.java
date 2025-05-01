@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.*;
+import frc.robot.subsystems.LED.StripEvents;
 import frc.robot.utilities.FileLog;
 import frc.robot.utilities.Loggable;
 import frc.robot.utilities.StringUtil;
@@ -32,6 +33,7 @@ public class Feeder extends SubsystemBase implements Loggable{
   private boolean fastLogging = false;
   private int logRotationKey;
   private final String subsystemName;
+  private final LED led;
 
   // Create Kraken for feeder motor
   private final TalonFX feeder = new TalonFX(Ports.CANFeeder);
@@ -54,15 +56,17 @@ public class Feeder extends SubsystemBase implements Loggable{
   private boolean velocityControlOn = false;
   private double setpointRPM;
   private double setpointPercent;
+  private boolean lastPiecePresentReading; // true = piece was present in feeder
 
   // Piece sensor inside the intake 
   private final DigitalInput pieceSensor = new DigitalInput(Ports.DIOFeederPieceSensor);
 
   /** Creates a new Feeder. */
-  public Feeder(FileLog log) {
+  public Feeder(FileLog log, LED led) {
     this.log = log;
     logRotationKey = log.allocateLogRotation();
     subsystemName = "Feeder";
+    this.led = led;
 
     // Configure feeder
     feederConfigurator = feeder.getConfigurator();
@@ -94,6 +98,8 @@ public class Feeder extends SubsystemBase implements Loggable{
 
     // Stop Feeder Motor
     stopFeeder();
+
+    lastPiecePresentReading = false;
   }
 
   /**
@@ -183,7 +189,6 @@ public class Feeder extends SubsystemBase implements Loggable{
   // ***  Piece sensor
 
   /**
-   * 
    * @return true if piece is in feeder
    */
   public boolean isPiecePresent(){
@@ -201,6 +206,17 @@ public class Feeder extends SubsystemBase implements Loggable{
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " RPM"), getFeederVelocity());
       SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Temp C"), feederTemp.refresh().getValueAsDouble());
       SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
+
+      // if we have a piece and previously didn't have a piece, update state
+      if (isPiecePresent() && !lastPiecePresentReading) {
+        led.sendEvent(StripEvents.PIECE_PRESENT);
+        lastPiecePresentReading = true;
+      }
+      // if we don't have a piece and previously did have a piece, update state
+      else if (!isPiecePresent() && lastPiecePresentReading) {
+          led.sendEvent(StripEvents.IDLE);
+          lastPiecePresentReading = false;
+      }
     }
   }
 
