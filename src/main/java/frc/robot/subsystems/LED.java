@@ -383,44 +383,6 @@ public class LED extends SubsystemBase {
         setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
       }
 
-      // Percent of the way through the last 10 seconds of the match (125 seconds in)
-      Double percent = Math.max(matchTimer.get() - 125, 0) / 10.0;
-
-      // Generates segment pattern for the left vertical segment based on percent
-      Color[] segmentPatternLeft = new Color[LEDSegmentRange.StripLeft.count];
-      for (int i = 0; i < LEDSegmentRange.StripLeft.count; i++) {
-        if (i >= (1.0 - percent) * LEDSegmentRange.StripLeft.count) {
-          segmentPatternLeft[i] = Color.kRed;
-        } else {
-          Color[] frame = segments.get(LEDSegmentRange.StripLeft).getCurrentFrame();
-          segmentPatternLeft[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-        }
-      }
-      // Generates segment pattern for the right vertical segment based on percent
-      Color[] segmentPatternRight = new Color[LEDSegmentRange.StripRight.count];
-      for (int i = 0; i < LEDSegmentRange.StripRight.count; i++) {
-        if (i < percent * LEDSegmentRange.StripRight.count) {
-          segmentPatternRight[i] = Color.kRed;
-        } else {
-          Color[] frame = segments.get(LEDSegmentRange.StripRight).getCurrentFrame();
-          segmentPatternRight[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-        }
-      }
-      // Generates segment pattern for the horizontal segment based on percent
-      Color[] segmentPatternHorizontal = new Color[LEDSegmentRange.StripHorizontal.count];
-      for (int i = 0; i < LEDSegmentRange.StripHorizontal.count; i++) {
-        if (i < percent * LEDSegmentRange.StripHorizontal.count) {
-          segmentPatternHorizontal[i] = Color.kRed;
-        } else {
-          Color[] frame = segments.get(LEDSegmentRange.StripHorizontal).getCurrentFrame();
-          segmentPatternHorizontal[i] = frame[Math.max(Math.min(frame.length - 1, i), 0)];
-        }
-      }
-      // Sets segments based on generated patterns
-      setAnimation(segmentPatternLeft, LEDSegmentRange.StripLeft, true);
-      setAnimation(segmentPatternRight, LEDSegmentRange.StripRight, true);
-      setAnimation(segmentPatternHorizontal, LEDSegmentRange.StripHorizontal, true);
-
       displayLEDs();
       if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
         clearHasPiece();

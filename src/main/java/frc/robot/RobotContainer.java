@@ -83,7 +83,8 @@ public class RobotContainer {
     configureShuffleboard();
 
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
-    driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
+    // driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
+    driveTrain.setDefaultCommand(new DriveWithController(driveTrain, xboxController, allianceSelection));
 
   }
 
@@ -215,7 +216,7 @@ public class RobotContainer {
     Trigger xbPOVDown = xboxController.povDown();
     Trigger xbRJoystickTrigger = xboxController.rightStick();
 
-
+    xbLB.onTrue(new ShootFullSequence(allianceSelection, driveTrain, shooter, feeder, wrist, robotState, log));
     
     // Prep for amp
     xbRB.onTrue( new ParallelCommandGroup(

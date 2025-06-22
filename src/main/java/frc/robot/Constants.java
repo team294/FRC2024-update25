@@ -99,6 +99,7 @@ public final class Constants {
       public static final double joystickDeadband = 0.01;
       public static final double manualElevatorDeadband = 0.1;
       public static final double manualWristDeadband = 0.1;
+      public static final double xboxJoystickDeadband = 0.1;
     }
 
     public static final class RobotDimensions {
