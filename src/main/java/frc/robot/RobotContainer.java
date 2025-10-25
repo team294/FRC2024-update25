@@ -83,8 +83,8 @@ public class RobotContainer {
     configureShuffleboard();
 
     // driveTrain.setDefaultCommand(new DriveWithJoystick(leftJoystick, rightJoystick, driveTrain, log));
-    // driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
-    driveTrain.setDefaultCommand(new DriveWithController(driveTrain, xboxController, allianceSelection));
+    driveTrain.setDefaultCommand(new DriveWithJoysticksAdvance(leftJoystick, rightJoystick, allianceSelection, driveTrain, robotState, log));
+    // driveTrain.setDefaultCommand(new DriveWithController(driveTrain, xboxController, allianceSelection));
 
   }
 
@@ -296,6 +296,11 @@ public class RobotContainer {
     // left[1].whileTrue(
     //   new DriveToAmp(allianceSelection, intake, feeder, wrist, driveTrain, robotState, log)
     // );
+
+    // Intake
+    left[1].onTrue(
+      new IntakePiece(intake, shooter, wrist, feeder, robotState, log)
+    );
 
     // Shoot the note
     left[2].onTrue(
