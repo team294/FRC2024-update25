@@ -299,7 +299,7 @@ public class RobotContainer {
 
     // Intake
     left[1].onTrue(
-      new IntakePiece(intake, shooter, wrist, feeder, robotState, log)
+      new IntakePiece(intake, feeder, wrist, shooter, robotState, log)
     );
 
     // Shoot the note
@@ -332,6 +332,14 @@ public class RobotContainer {
     //   new SetAimLock(driveTrain, false, log)
     // );
 
+    // Prep for pit shot when back button is pressed
+    right[1].onTrue(new SetShooterWristSpeaker(WristAngle.lowerLimit, 
+      ShooterConstants.shooterVelocityPit, ShooterConstants.shooterVelocityPit, shooter, wrist, intake, feeder, robotState, log));
+    // Shoot in slow speed pit shot when released
+    right[1].onFalse( new ShootPiece( ShooterConstants.shooterVelocityPit, ShooterConstants.shooterVelocityPit, true,
+      shooter, feeder, wrist, robotState, log));
+
+    right[2].onTrue(new DriveResetPose(driveTrain, log));
     // // Right button 2:  Aim lock on far pass target
     // right[2].whileTrue(new ParallelCommandGroup(
     //   new SetAimLock(driveTrain, true, log),
