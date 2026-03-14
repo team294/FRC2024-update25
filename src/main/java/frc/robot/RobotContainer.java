@@ -96,7 +96,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     configureXboxButtons(); // configure xbox controller
-    configureJoystickButtons(); // configure joysticks
+    // configureJoystickButtons(); // configure joysticks
     configureCopanel(); // configure copanel
     configureTriggers();
   }
@@ -358,15 +358,15 @@ public class RobotContainer {
       coP[i] = new JoystickButton(coPanel, i);
     }
 
-    // top row UP then DOWN, from LEFT to RIGHT
-    coP[1].onTrue(new ClimbStart(wrist, log, led));
-    coP[3].onTrue(new ClimbEnd(wrist, log, led));
-    // Nudge angle up or down
-    coP[5].onTrue(new WristNudgeAngle(-1, wrist, log)); // Nudge up
-    coP[6].onTrue(new WristNudgeAngle(1, wrist, log)); // Nudge down
+    // // top row UP then DOWN, from LEFT to RIGHT
+    // coP[1].onTrue(new ClimbStart(wrist, log, led));
+    // coP[3].onTrue(new ClimbEnd(wrist, log, led));
+    // // Nudge angle up or down
+    // coP[5].onTrue(new WristNudgeAngle(-1, wrist, log)); // Nudge up
+    // coP[6].onTrue(new WristNudgeAngle(1, wrist, log)); // Nudge down
 
-    coP[9].onTrue(new WristNudgeAmpAngle(1, wrist, log)); //Nudge down
-    coP[10].onTrue(new WristNudgeAmpAngle(-1 ,wrist, log)); //Nudge up
+    // coP[9].onTrue(new WristNudgeAmpAngle(1, wrist, log)); //Nudge down
+    // coP[10].onTrue(new WristNudgeAmpAngle(-1 ,wrist, log)); //Nudge up
 
     coP[11].onTrue(new DriveResetPose(0, false, driveTrain, log));
   }

@@ -559,11 +559,11 @@ public class SwerveModule {
    * Updates relevant variables on Shuffleboard
    */
   public void updateShuffleboard() {
-    SmartDashboard.putNumber(buildString("Swerve FXangle ", swName), MathBCR.normalizeAngle(getTurningEncoderDegrees()));
-    SmartDashboard.putNumber(buildString("Swerve CCangle ", swName), getCanCoderDegrees());
-    SmartDashboard.putNumber(buildString("Swerve FXangle dps", swName), getTurningEncoderVelocityDPS());
-    SmartDashboard.putNumber(buildString("Swerve distance", swName), getDriveEncoderMeters());
-    SmartDashboard.putNumber(buildString("Swerve drive temp ", swName), getDriveTemp());
+    // SmartDashboard.putNumber(buildString("Swerve FXangle ", swName), MathBCR.normalizeAngle(getTurningEncoderDegrees()));
+    // SmartDashboard.putNumber(buildString("Swerve CCangle ", swName), getCanCoderDegrees());
+    // SmartDashboard.putNumber(buildString("Swerve FXangle dps", swName), getTurningEncoderVelocityDPS());
+    // SmartDashboard.putNumber(buildString("Swerve distance", swName), getDriveEncoderMeters());
+    // SmartDashboard.putNumber(buildString("Swerve drive temp ", swName), getDriveTemp());
   }
 
   /**

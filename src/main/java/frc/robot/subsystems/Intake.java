@@ -238,15 +238,15 @@ public class Intake extends SubsystemBase implements Loggable {
     }
 
     if(log.isMyLogRotation(logRotationKey)) {
-        SmartDashboard.putNumber(buildString(subsystemName, " Voltage"), intakeVoltage.refresh().getValueAsDouble());
-        // SmartDashboard.putNumber(buildString(subsystemName, " Position Rev"), getIntakePosition());
-        SmartDashboard.putNumber(buildString(subsystemName, " Velocity RPM"), getIntakeVelocity());
-        SmartDashboard.putNumber(buildString(subsystemName, " Temperature C"), intakeTemp.refresh().getValueAsDouble());
-        SmartDashboard.putNumber("Centering Voltage", centeringVoltage.refresh().getValueAsDouble());
-        // SmartDashboard.putNumber("Centering Position Rev", getCenteringMotorPosition());
-        SmartDashboard.putNumber("Centering Velocity RPM", getCenteringMotorVelocity());
-        SmartDashboard.putNumber("Centering Temperature C", centeringTemp.refresh().getValueAsDouble());
-        SmartDashboard.putBoolean(buildString(subsystemName, " Is Piece Present"), isPiecePresent());
+        // SmartDashboard.putNumber(buildString(subsystemName, " Voltage"), intakeVoltage.refresh().getValueAsDouble());
+        // // SmartDashboard.putNumber(buildString(subsystemName, " Position Rev"), getIntakePosition());
+        // SmartDashboard.putNumber(buildString(subsystemName, " Velocity RPM"), getIntakeVelocity());
+        // SmartDashboard.putNumber(buildString(subsystemName, " Temperature C"), intakeTemp.refresh().getValueAsDouble());
+        // SmartDashboard.putNumber("Centering Voltage", centeringVoltage.refresh().getValueAsDouble());
+        // // SmartDashboard.putNumber("Centering Position Rev", getCenteringMotorPosition());
+        // SmartDashboard.putNumber("Centering Velocity RPM", getCenteringMotorVelocity());
+        // SmartDashboard.putNumber("Centering Temperature C", centeringTemp.refresh().getValueAsDouble());
+        // SmartDashboard.putBoolean(buildString(subsystemName, " Is Piece Present"), isPiecePresent());
     }
 
     // Reset safety time if current is below the threshhold

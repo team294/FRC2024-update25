@@ -197,10 +197,10 @@ public class Feeder extends SubsystemBase implements Loggable{
     if (fastLogging || log.isMyLogRotation(logRotationKey)) {
       updateLog(false);
 
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Voltage"), getFeederVoltage());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " RPM"), getFeederVelocity());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Temp C"), feederTemp.refresh().getValueAsDouble());
-      SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
+      // SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Voltage"), getFeederVoltage());
+      // SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " RPM"), getFeederVelocity());
+      // SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Temp C"), feederTemp.refresh().getValueAsDouble());
+      // SmartDashboard.putBoolean("Feeder has piece", isPiecePresent());
     }
   }
 

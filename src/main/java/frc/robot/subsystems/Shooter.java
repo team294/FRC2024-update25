@@ -297,13 +297,13 @@ public class Shooter extends SubsystemBase implements Loggable {
     if (fastLogging || log.isMyLogRotation(logRotationKey)) {
       updateLog(false);
 
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Voltage"), getTopShooterVoltage());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Voltage"), getBottomShooterVoltage());
-     // SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Position Rev"), getShooterPosition());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top RPM"), getTopShooterVelocity());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom RPM"), getBottomShooterVelocity());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
-      SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Voltage"), getTopShooterVoltage());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Voltage"), getBottomShooterVoltage());
+    //  // SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Position Rev"), getShooterPosition());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top RPM"), getTopShooterVelocity());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom RPM"), getBottomShooterVelocity());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Top Temp C"), shooterTopTemp.refresh().getValueAsDouble());
+    //   SmartDashboard.putNumber(StringUtil.buildString(subsystemName, " Bottom Temp C"), shooterBottomTemp.refresh().getValueAsDouble());
       
     }
   }

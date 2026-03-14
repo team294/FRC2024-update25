@@ -357,36 +357,36 @@ public class LED extends SubsystemBase {
   @Override
   public void periodic() {
 
-    if(log.isMyLogRotation(logRotationKey)) {
-      // Updates certain segments based on RobotState
-      updateStateLEDs(LEDSegmentRange.StripLeft);
-      updateStateLEDs(LEDSegmentRange.StripRight);
-      updateStateLEDs(LEDSegmentRange.StripHorizontal);
+  //   if(log.isMyLogRotation(logRotationKey)) {
+  //     // Updates certain segments based on RobotState
+  //     updateStateLEDs(LEDSegmentRange.StripLeft);
+  //     updateStateLEDs(LEDSegmentRange.StripRight);
+  //     updateStateLEDs(LEDSegmentRange.StripHorizontal);
 
-      // Sets CANdle red if there is a sticky fault ()
-      boolean stickyFault = false;
-      if(RobotPreferences.isStickyFaultActive()) {
-        setAnimation(Color.kRed, LEDSegmentRange.CANdle);
-        stickyFault = true;
-      }
-      // Removes red if sticky fault is no longer active
-      else if (!RobotPreferences.isStickyFaultActive()) {
-        setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
-      }
+  //     // Sets CANdle red if there is a sticky fault ()
+  //     boolean stickyFault = false;
+  //     if(RobotPreferences.isStickyFaultActive()) {
+  //       setAnimation(Color.kRed, LEDSegmentRange.CANdle);
+  //       stickyFault = true;
+  //     }
+  //     // Removes red if sticky fault is no longer active
+  //     else if (!RobotPreferences.isStickyFaultActive()) {
+  //       setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
+  //     }
 
-      // Sets CANdle yellow until wrist is calibrated
-      if (!wrist.isEncoderCalibrated()) {
-        setAnimation(Color.kYellow, LEDSegmentRange.CANdle);
-      }
-      // Removes yellow when wrist is calibrated
-      else if (wrist.isEncoderCalibrated() && !stickyFault) {
-        setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
-      }
+  //     // Sets CANdle yellow until wrist is calibrated
+  //     if (!wrist.isEncoderCalibrated()) {
+  //       setAnimation(Color.kYellow, LEDSegmentRange.CANdle);
+  //     }
+  //     // Removes yellow when wrist is calibrated
+  //     else if (wrist.isEncoderCalibrated() && !stickyFault) {
+  //       setAnimation(Color.kBlack, LEDSegmentRange.CANdle);
+  //     }
 
-      displayLEDs();
-      if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
-        clearHasPiece();
-      }
-    }
+  //     displayLEDs();
+  //     if (DriverStation.isDisabled()) { // non-permanent piece detection when robot is disabled
+  //       clearHasPiece();
+  //     }
+  //   }
   }
 }
